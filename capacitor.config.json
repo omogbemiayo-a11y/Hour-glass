@@ -1,0 +1,15 @@
+{
+  "appId": "com.g33by.hourglass",
+  "appName": "Hourglass",
+  "webDir": "www",
+  "backgroundColor": "#0A0A0B",
+  "android": {
+    "backgroundColor": "#0A0A0B"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#D4AF37"
+    }
+  }
+}
