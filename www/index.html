@@ -736,18 +736,15 @@
         }
 
         .hour-detail {
-            display: grid;
-            grid-template-rows: 0fr;
+            max-height: 0;
             overflow: hidden;
-            transition: grid-template-rows 0.35s var(--transition-smooth);
+            transition: max-height 0.32s var(--transition-smooth);
             border-top: 1px solid transparent;
         }
         .hour-card.open .hour-detail {
-            grid-template-rows: 1fr;
             border-top-color: var(--border-light);
         }
         .detail-inner {
-            min-height: 0;
             overflow: hidden;
             padding: 14px 16px 16px;
             background: var(--bg-card-hover);
@@ -978,21 +975,16 @@
         }
 
         .analytics-panel {
-            display: grid;
-            grid-template-rows: 0fr;
+            max-height: 0;
             overflow: hidden;
-            transition: grid-template-rows 0.4s var(--transition-smooth);
+            transition: max-height 0.4s var(--transition-smooth);
             background: var(--bg-card);
             border-radius: var(--radius-sm);
             border: 1.5px solid var(--border-light);
             border-top: none;
             box-shadow: var(--shadow-sm);
         }
-        .analytics-panel.open {
-            grid-template-rows: 1fr;
-        }
         .analytics-inner {
-            min-height: 0;
             overflow: hidden;
             padding: 16px 20px 20px;
         }
@@ -1577,6 +1569,24 @@
             }
 
             // ---------- RENDER ----------
+            function openHourCard(card) {
+                card._isOpen = true;
+                card.classList.add('open');
+                const detail = card.querySelector('.hour-detail');
+                if (detail) {
+                    detail.style.maxHeight = detail.scrollHeight + 'px';
+                }
+            }
+
+            function closeHourCard(card) {
+                card._isOpen = false;
+                card.classList.remove('open');
+                const detail = card.querySelector('.hour-detail');
+                if (detail) {
+                    detail.style.maxHeight = '0px';
+                }
+            }
+
             function renderGrid() {
                 grid.innerHTML = '';
                 const dayData = getDayData(currentDateStr);
@@ -1634,18 +1644,13 @@
                     head.addEventListener('click', (e) => {
                         if (e.target.closest('.grade-btn') || e.target.closest('textarea')) return;
                         if (card._isOpen) {
-                            card._isOpen = false;
-                            card.classList.remove('open');
+                            closeHourCard(card);
                             return;
                         }
                         document.querySelectorAll('.hour-card.open').forEach(other => {
-                            if (other !== card) {
-                                other._isOpen = false;
-                                other.classList.remove('open');
-                            }
+                            if (other !== card) closeHourCard(other);
                         });
-                        card._isOpen = true;
-                        card.classList.add('open');
+                        openHourCard(card);
                         requestAnimationFrame(() => {
                             const rect = card.getBoundingClientRect();
                             const viewportHeight = window.innerHeight;
@@ -1695,8 +1700,7 @@
                             recomputeStatsAndUI();
                             saveState();
                             if (newGrade) {
-                                card._isOpen = false;
-                                card.classList.remove('open');
+                                closeHourCard(card);
                             }
                         });
                     });
@@ -2305,10 +2309,16 @@
 
                 // Analytics toggle
                 analyticsToggle.addEventListener('click', () => {
-                    analyticsToggle.classList.toggle('open');
-                    analyticsPanel.classList.toggle('open');
-                    if (analyticsPanel.classList.contains('open')) {
+                    const opening = !analyticsPanel.classList.contains('open');
+                    analyticsToggle.classList.toggle('open', opening);
+                    analyticsPanel.classList.toggle('open', opening);
+                    if (opening) {
                         renderAnalytics();
+                        requestAnimationFrame(() => {
+                            analyticsPanel.style.maxHeight = analyticsPanel.scrollHeight + 'px';
+                        });
+                    } else {
+                        analyticsPanel.style.maxHeight = '0px';
                     }
                 });
 
