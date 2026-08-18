@@ -172,8 +172,8 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 2000;
             display: none;
             align-items: center;
@@ -618,9 +618,8 @@
             border: 1.5px solid var(--border-light);
             box-shadow: var(--shadow-sm);
             overflow: hidden;
-            transition: all 0.3s var(--transition-smooth);
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s var(--transition-smooth);
             transform: translateX(0);
-            will-change: transform, opacity;
         }
         .hour-card:hover {
             border-color: #c8c0b0;
@@ -737,16 +736,19 @@
         }
 
         .hour-detail {
-            max-height: 0;
+            display: grid;
+            grid-template-rows: 0fr;
             overflow: hidden;
-            transition: max-height 0.4s var(--transition-smooth);
+            transition: grid-template-rows 0.35s var(--transition-smooth);
             border-top: 1px solid transparent;
         }
         .hour-card.open .hour-detail {
-            max-height: 220px;
+            grid-template-rows: 1fr;
             border-top-color: var(--border-light);
         }
         .detail-inner {
+            min-height: 0;
+            overflow: hidden;
             padding: 14px 16px 16px;
             background: var(--bg-card-hover);
         }
@@ -824,8 +826,8 @@
             position: fixed;
             inset: 0;
             background: rgba(26, 26, 46, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             display: none;
             align-items: flex-end;
             justify-content: center;
@@ -976,9 +978,10 @@
         }
 
         .analytics-panel {
-            max-height: 0;
+            display: grid;
+            grid-template-rows: 0fr;
             overflow: hidden;
-            transition: max-height 0.4s var(--transition-smooth);
+            transition: grid-template-rows 0.4s var(--transition-smooth);
             background: var(--bg-card);
             border-radius: var(--radius-sm);
             border: 1.5px solid var(--border-light);
@@ -986,9 +989,11 @@
             box-shadow: var(--shadow-sm);
         }
         .analytics-panel.open {
-            max-height: 400px;
+            grid-template-rows: 1fr;
         }
         .analytics-inner {
+            min-height: 0;
+            overflow: hidden;
             padding: 16px 20px 20px;
         }
         .analytics-inner .chart-row {
@@ -1641,8 +1646,6 @@
                         });
                         card._isOpen = true;
                         card.classList.add('open');
-                        // Focus textarea after a tiny delay
-                        setTimeout(() => textarea.focus(), 100);
                         requestAnimationFrame(() => {
                             const rect = card.getBoundingClientRect();
                             const viewportHeight = window.innerHeight;
@@ -1691,16 +1694,9 @@
                             if (navigator.vibrate) navigator.vibrate(10);
                             recomputeStatsAndUI();
                             saveState();
-                            if (newGrade && !card._isOpen) {
-                                document.querySelectorAll('.hour-card.open').forEach(other => {
-                                    if (other !== card) {
-                                        other._isOpen = false;
-                                        other.classList.remove('open');
-                                    }
-                                });
-                                card._isOpen = true;
-                                card.classList.add('open');
-                                setTimeout(() => textarea.focus(), 100);
+                            if (newGrade) {
+                                card._isOpen = false;
+                                card.classList.remove('open');
                             }
                         });
                     });
@@ -1843,7 +1839,7 @@
                         display: flex; align-items: center; gap: 12px;
                         animation: slideUp 0.5s var(--transition-spring);
                         max-width: 90%;
-                        backdrop-filter: blur(12px);
+                        backdrop-filter: blur(6px);
                     `;
                 toast.innerHTML = `
                         <span style="font-size:28px;">${ach.icon}</span>
