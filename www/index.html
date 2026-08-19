@@ -516,6 +516,206 @@
             color: var(--rose);
         }
 
+        /* ---------- GOAL CARD ---------- */
+        .goal-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            padding: 16px 18px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .goal-card.achieved {
+            border-color: var(--emerald);
+            box-shadow: 0 2px 14px rgba(6, 214, 160, 0.22);
+        }
+        .goal-empty {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .goal-empty .prompt {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .goal-empty .plus {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px dashed var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .goal-set {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .goal-status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid var(--border-light);
+            color: var(--text-muted);
+            transition: all 0.3s var(--transition-spring);
+        }
+        .goal-card.achieved .goal-status-icon {
+            border-color: var(--emerald);
+            background: rgba(6, 214, 160, 0.14);
+            color: var(--emerald);
+            transform: scale(1.08);
+        }
+        .goal-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .goal-text {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .goal-progress-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .goal-track {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-light);
+            overflow: hidden;
+        }
+        .goal-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--gold);
+            transition: width 0.4s var(--transition-smooth), background 0.3s;
+        }
+        .goal-card.achieved .goal-fill {
+            background: var(--emerald);
+        }
+        .goal-frac {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            letter-spacing: 0.02em;
+        }
+        .goal-card.achieved .goal-frac {
+            color: var(--emerald);
+        }
+        .goal-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .goal-actions button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .goal-actions button:active {
+            background: var(--border-light);
+        }
+        .goal-edit-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .goal-edit-row input[type="text"] {
+            width: 100%;
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-family: inherit;
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .goal-edit-row input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-1);
+        }
+        .goal-target-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .goal-target-row .lbl {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .goal-stepper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .goal-stepper button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-light);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .goal-stepper .val {
+            font-size: 15px;
+            font-weight: 800;
+            min-width: 20px;
+            text-align: center;
+        }
+        .goal-edit-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+        }
+        .goal-edit-buttons button {
+            flex: 1;
+            padding: 9px 0;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-light);
+            font-size: 12.5px;
+            font-weight: 700;
+            background: var(--bg-card-hover);
+            color: var(--text-secondary);
+        }
+        .goal-edit-buttons .save-btn {
+            background: var(--accent-1);
+            border-color: var(--accent-1);
+            color: #fff;
+        }
+
         /* ---------- WINDOW BAR ---------- */
         .window-bar {
             background: var(--bg-card);
@@ -625,6 +825,31 @@
             border-color: #c8c0b0;
             box-shadow: var(--shadow-md);
             transform: translateX(2px);
+        }
+        .hour-card.locked .hour-head {
+            cursor: default;
+        }
+        .hour-card.locked:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(0);
+        }
+        .hour-card.locked .note {
+            color: var(--text-secondary);
+        }
+        .hour-card.locked .hour-chevron {
+            font-size: 13px;
+            opacity: 0.55;
+        }
+        .hour-card.shake {
+            animation: cardShake 0.4s ease;
+        }
+        @keyframes cardShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
         }
         .hour-head {
             display: flex;
@@ -1304,6 +1529,9 @@
             </div>
         </div>
 
+        <!-- GOAL -->
+        <div class="goal-card" id="goalCard"></div>
+
         <!-- ANALYTICS TOGGLE -->
         <div class="analytics-toggle" id="analyticsToggle">
             <span class="label">📊 7-Day Insights</span>
@@ -1408,6 +1636,7 @@
             const cntProd = document.getElementById('cntProd');
             const cntNeut = document.getElementById('cntNeut');
             const cntWast = document.getElementById('cntWast');
+            const goalCard = document.getElementById('goalCard');
             const winLabel = document.getElementById('winLabel');
             const streakCount = document.getElementById('streakCount');
             const dateDisplay = document.getElementById('dateDisplay');
@@ -1449,6 +1678,11 @@
             }
 
             function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+            function escapeHtml(str) {
+                const d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
+            }
 
             function formatDate(date) {
                 const y = date.getFullYear();
@@ -1491,6 +1725,9 @@
             function getDayData(dateStr) {
                 if (!state[dateStr]) {
                     state[dateStr] = { hours: {} };
+                }
+                if (!state[dateStr].goal) {
+                    state[dateStr].goal = { text: '', target: 0 };
                 }
                 return state[dateStr];
             }
@@ -1591,6 +1828,7 @@
                 grid.innerHTML = '';
                 const dayData = getDayData(currentDateStr);
                 const hours = dayData.hours || {};
+                const isPastDay = currentDateStr !== getTodayStr();
 
                 for (let h = startHour; h < endHour; h++) {
                     const { h: hh, period } = fmtHour(h);
@@ -1608,7 +1846,7 @@
                     const noteEmpty = !text ? 'empty' : '';
 
                     const card = document.createElement('div');
-                    card.className = 'hour-card';
+                    card.className = 'hour-card' + (isPastDay ? ' locked' : '');
                     card.dataset.hour = h;
                     card._isOpen = false;
 
@@ -1622,15 +1860,15 @@
                                     <div class="note ${noteEmpty}">${noteText}</div>
                                     <div>${stampHTML}</div>
                                 </div>
-                                <div class="hour-chevron">▾</div>
+                                <div class="hour-chevron">${isPastDay ? '🔒' : '▾'}</div>
                             </div>
                             <div class="hour-detail">
                                 <div class="detail-inner">
-                                    <textarea placeholder="What did you do this hour?">${text}</textarea>
+                                    <textarea placeholder="What did you do this hour?" ${isPastDay ? 'readonly' : ''}>${text}</textarea>
                                     <div class="grade-group">
-                                        <button class="grade-btn ${grade === 'prod' ? 'selected-prod' : ''}" data-grade="prod">⚡ Productive</button>
-                                        <button class="grade-btn ${grade === 'neut' ? 'selected-neut' : ''}" data-grade="neut">◎ Neutral</button>
-                                        <button class="grade-btn ${grade === 'wast' ? 'selected-wast' : ''}" data-grade="wast">✕ Wasted</button>
+                                        <button class="grade-btn ${grade === 'prod' ? 'selected-prod' : ''}" data-grade="prod" ${isPastDay ? 'disabled' : ''}>⚡ Productive</button>
+                                        <button class="grade-btn ${grade === 'neut' ? 'selected-neut' : ''}" data-grade="neut" ${isPastDay ? 'disabled' : ''}>◎ Neutral</button>
+                                        <button class="grade-btn ${grade === 'wast' ? 'selected-wast' : ''}" data-grade="wast" ${isPastDay ? 'disabled' : ''}>✕ Wasted</button>
                                     </div>
                                 </div>
                             </div>
@@ -1642,6 +1880,12 @@
                     const gradeBtns = card.querySelectorAll('.grade-btn');
 
                     head.addEventListener('click', (e) => {
+                        if (isPastDay) {
+                            card.classList.remove('shake');
+                            void card.offsetWidth;
+                            card.classList.add('shake');
+                            return;
+                        }
                         if (e.target.closest('.grade-btn') || e.target.closest('textarea')) return;
                         if (card._isOpen) {
                             closeHourCard(card);
@@ -2016,6 +2260,9 @@
                 cntNeut.textContent = stats.neut;
                 cntWast.textContent = stats.wast;
 
+                // Goal
+                renderGoalCard(stats);
+
                 // Achievements
                 computeAchievements();
 
@@ -2024,6 +2271,112 @@
 
                 saveState();
                 isInitialLoad = false;
+            }
+
+            // ---------- GOAL ----------
+            function renderGoalCard(stats) {
+                const day = getDayData(currentDateStr);
+                const goal = day.goal;
+                const achieved = goal.target > 0 && stats.prod >= goal.target;
+
+                goalCard.classList.toggle('achieved', achieved);
+
+                if (achieved && !goal.achievedFired && !isInitialLoad) {
+                    goal.achievedFired = true;
+                    fireConfetti(30);
+                    if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
+                } else if (!achieved) {
+                    goal.achievedFired = false;
+                }
+
+                if (goalCard.dataset.editing === '1') {
+                    return; // don't blow away an in-progress edit
+                }
+
+                if (!goal.text && !goal.target) {
+                    goalCard.innerHTML = `
+                        <div class="goal-empty" id="goalEmptyRow">
+                            <div class="prompt"><span class="plus">+</span> Set a goal for today</div>
+                        </div>
+                    `;
+                    document.getElementById('goalEmptyRow').addEventListener('click', openGoalEditor);
+                    return;
+                }
+
+                const pct = goal.target > 0 ? clamp((stats.prod / goal.target) * 100, 0, 100) : 0;
+                goalCard.innerHTML = `
+                    <div class="goal-set">
+                        <div class="goal-status-icon">${achieved ? '✓' : '🎯'}</div>
+                        <div class="goal-body">
+                            <div class="goal-text">${escapeHtml(goal.text || 'Daily goal')}</div>
+                            <div class="goal-progress-row">
+                                <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
+                                <div class="goal-frac">${stats.prod}/${goal.target}</div>
+                            </div>
+                        </div>
+                        <div class="goal-actions">
+                            <button id="goalEditBtn" title="Edit">✎</button>
+                            <button id="goalClearBtn" title="Clear">×</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('goalEditBtn').addEventListener('click', openGoalEditor);
+                document.getElementById('goalClearBtn').addEventListener('click', () => {
+                    goal.text = '';
+                    goal.target = 0;
+                    goal.achievedFired = false;
+                    saveState();
+                    recomputeStatsAndUI();
+                });
+            }
+
+            function openGoalEditor() {
+                goalCard.dataset.editing = '1';
+                const day = getDayData(currentDateStr);
+                renderGoalEditor(day.goal);
+            }
+
+            function renderGoalEditor(goal) {
+                let target = goal.target || 3;
+                goalCard.innerHTML = `
+                    <div class="goal-edit-row">
+                        <input type="text" id="goalTextInput" placeholder="What's today's goal?" maxlength="60" value="${escapeHtml(goal.text || '')}">
+                        <div class="goal-target-row">
+                            <span class="lbl">Productive hours target</span>
+                            <div class="goal-stepper">
+                                <button id="goalMinus">−</button>
+                                <span class="val" id="goalTargetVal">${target}</span>
+                                <button id="goalPlus">+</button>
+                            </div>
+                        </div>
+                        <div class="goal-edit-buttons">
+                            <button id="goalCancelBtn">Cancel</button>
+                            <button class="save-btn" id="goalSaveBtn">Save Goal</button>
+                        </div>
+                    </div>
+                `;
+                const targetVal = document.getElementById('goalTargetVal');
+                document.getElementById('goalMinus').addEventListener('click', () => {
+                    target = Math.max(1, target - 1);
+                    targetVal.textContent = target;
+                });
+                document.getElementById('goalPlus').addEventListener('click', () => {
+                    target = Math.min(16, target + 1);
+                    targetVal.textContent = target;
+                });
+                document.getElementById('goalCancelBtn').addEventListener('click', () => {
+                    goalCard.dataset.editing = '';
+                    recomputeStatsAndUI();
+                });
+                document.getElementById('goalSaveBtn').addEventListener('click', () => {
+                    const textInput = document.getElementById('goalTextInput');
+                    goal.text = textInput.value.trim();
+                    goal.target = target;
+                    goal.achievedFired = false;
+                    goalCard.dataset.editing = '';
+                    saveState();
+                    recomputeStatsAndUI();
+                });
             }
 
             function updateDayDisplay() {
@@ -2055,6 +2408,7 @@
                 setTimeout(() => {
                     currentDateStr = dateStr;
                     getDayData(currentDateStr);
+                    goalCard.dataset.editing = '';
                     renderGrid();
                     for (let h = startHour; h < endHour; h++) {
                         const card = grid.querySelector(`.hour-card[data-hour="${h}"]`);
