@@ -769,6 +769,29 @@
         .window-bar .edit-btn:active {
             transform: scale(0.94);
         }
+        .window-bar .ghost-btn {
+            background: transparent;
+            border: 1.5px solid var(--border-light);
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            font-family: inherit;
+        }
+        .window-bar .ghost-btn:hover {
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+        .window-bar .ghost-btn:active {
+            transform: scale(0.94);
+        }
+        .window-bar .btn-row {
+            display: flex;
+            gap: 8px;
+        }
 
         /* ---------- ACHIEVEMENTS ROW ---------- */
         .achievements-row {
@@ -1779,6 +1802,41 @@
                         theme,
                     }));
                 } catch (_) { /* ignore */ }
+                scheduleSilentBackup();
+            }
+
+            // ---------- SILENT BACKGROUND BACKUP ----------
+            function buildBackupPayload() {
+                return JSON.stringify({
+                    app: 'hourglass',
+                    exportedAt: new Date().toISOString(),
+                    data: {
+                        state,
+                        startHour,
+                        endHour,
+                        totalXP,
+                        streak,
+                        unlockedAchievements: [...unlockedAchievements],
+                        theme,
+                    },
+                }, null, 2);
+            }
+
+            let backupDebounceTimer = null;
+            function scheduleSilentBackup() {
+                const LN = window.Capacitor && window.Capacitor.Plugins;
+                if (!(LN && LN.Filesystem)) return; // no-op outside the native app
+                clearTimeout(backupDebounceTimer);
+                backupDebounceTimer = setTimeout(async () => {
+                    try {
+                        await LN.Filesystem.writeFile({
+                            path: 'hourglass-autobackup.json',
+                            data: buildBackupPayload(),
+                            directory: 'EXTERNAL',
+                            encoding: 'utf8',
+                        });
+                    } catch (_) { /* silent, non-critical */ }
+                }, 3000);
             }
 
             // ---------- CONFETTI ----------
@@ -2652,6 +2710,7 @@
 
                 // events
                 editWindowBtn.addEventListener('click', openModal);
+
                 modalCloseBtn.addEventListener('click', closeModal);
                 modalApplyBtn.addEventListener('click', applyWindow);
                 resetBtn.addEventListener('click', resetAll);
