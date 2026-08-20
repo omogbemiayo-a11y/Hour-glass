@@ -1,15 +1,19 @@
 {
-  "appId": "com.g33by.hourglass",
-  "appName": "Hourglass",
-  "webDir": "www",
-  "backgroundColor": "#0A0A0B",
-  "android": {
-    "backgroundColor": "#0A0A0B"
+  "name": "hourglass",
+  "version": "1.0.0",
+  "description": "Hourly accountability & XP tracker",
+  "scripts": {
+    "sync": "npx cap sync"
   },
-  "plugins": {
-    "LocalNotifications": {
-      "smallIcon": "ic_stat_icon_config_sample",
-      "iconColor": "#D4AF37"
-    }
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/preferences": "^6.0.2",
+    "@capacitor/local-notifications": "^6.1.0",
+    "@capacitor/filesystem": "^6.0.3",
+    "@capacitor/share": "^6.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
   }
 }
