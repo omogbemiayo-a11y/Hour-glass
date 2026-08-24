@@ -1,0 +1,3357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>Hourly — Premium</title>
+    <script>
+    (function() {
+        try {
+            var raw = localStorage.getItem('hourly_state_v3');
+            var theme = raw ? (JSON.parse(raw).theme || 'light') : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        } catch (_) {}
+    })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <style>
+        /* ---------- RESET & BASE ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg-page: #f8f6f0;
+            --bg-card: #ffffff;
+            --bg-card-hover: #fdfcfa;
+            --border-light: #e8e3d8;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --text-muted: #8a8a9a;
+            --accent-1: #4361ee;
+            --accent-2: #3a0ca3;
+            --accent-glow: rgba(67, 97, 238, 0.15);
+            --gold: #f77f00;
+            --gold-glow: rgba(247, 127, 0, 0.15);
+            --emerald: #06d6a0;
+            --emerald-glow: rgba(6, 214, 160, 0.12);
+            --rose: #ef476f;
+            --rose-glow: rgba(239, 71, 111, 0.12);
+            --radius-card: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --shadow-sm: 0 2px 8px rgba(26, 26, 46, 0.04);
+            --shadow-md: 0 8px 30px rgba(26, 26, 46, 0.08);
+            --shadow-lg: 0 20px 60px rgba(26, 26, 46, 0.12);
+            --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        /* Dark mode */
+        [data-theme="dark"] {
+            --bg-page: #121018;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-card-hover: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --text-primary: #f0ede8;
+            --text-secondary: #a0988e;
+            --text-muted: #6b6359;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            background: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 16px 40px;
+            background-image: radial-gradient(ellipse at 10% 20%, rgba(67, 97, 238, 0.04), transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(247, 127, 0, 0.04), transparent 50%);
+            background-attachment: fixed;
+            transition: background 0.3s;
+        }
+        [data-theme="dark"] body {
+            background-image: radial-gradient(ellipse at 10% 20%, rgba(124, 58, 237, 0.08), transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(251, 191, 36, 0.05), transparent 50%);
+        }
+        #app {
+            max-width: 600px;
+            width: 100%;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+        }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2px;
+        }
+        .header-left .date {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .header-left .date strong {
+            color: var(--text-primary);
+        }
+        .header-left .greeting {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .streak-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            border-radius: 40px;
+            padding: 6px 14px 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, background 0.3s, transform 0.15s;
+            cursor: pointer;
+        }
+        .streak-pill:active {
+            transform: scale(0.94);
+        }
+        .streak-pill .flame {
+            color: var(--gold);
+            font-size: 16px;
+        }
+        .top-btn {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-muted);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--transition-spring);
+        }
+        .top-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+            transform: scale(1.04);
+        }
+        .top-btn:active {
+            transform: scale(0.92);
+        }
+        .top-btn.theme-toggle:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ---------- ONBOARDING OVERLAY ---------- */
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+        .onboarding-overlay.active {
+            display: flex;
+        }
+        .onboarding-card {
+            max-width: 420px;
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            padding: 32px 28px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.4s var(--transition-smooth);
+        }
+        .onboarding-overlay.active .onboarding-card {
+            transform: scale(1) translateY(0);
+        }
+        .onboarding-card .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .onboarding-card h2 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .onboarding-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .onboarding-card .steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .onboarding-card .steps .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-light);
+            transition: all 0.3s;
+        }
+        .onboarding-card .steps .dot.active {
+            background: var(--accent-1);
+            width: 24px;
+            border-radius: 12px;
+        }
+        .onboarding-card .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .onboarding-card .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+        .onboarding-card .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .onboarding-card .btn-skip {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            padding: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ---------- DAY NAV ---------- */
+        .day-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s;
+        }
+        .day-nav .nav-btn {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            padding: 4px 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s var(--transition-spring);
+            font-weight: 300;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .day-nav .nav-btn:hover {
+            color: var(--accent-1);
+            transform: scale(1.2);
+        }
+        .day-nav .nav-btn:active {
+            transform: scale(0.8);
+        }
+        .day-nav .day-label {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .day-nav .day-label .grade-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 800;
+            background: var(--border-light);
+            color: var(--text-secondary);
+            transition: all 0.3s var(--transition-smooth);
+        }
+        .day-nav .day-label .grade-badge.grade-a {
+            background: var(--emerald-glow);
+            color: var(--emerald);
+        }
+        .day-nav .day-label .grade-badge.grade-b {
+            background: var(--gold-glow);
+            color: var(--gold);
+        }
+        .day-nav .day-label .grade-badge.grade-c {
+            background: rgba(247, 127, 0, 0.1);
+            color: #d97706;
+        }
+        .day-nav .day-label .grade-badge.grade-d {
+            background: var(--rose-glow);
+            color: var(--rose);
+        }
+        .day-nav .day-label .grade-badge.grade-f {
+            background: rgba(239, 71, 111, 0.2);
+            color: #b91c3a;
+        }
+        .day-nav .day-label .grade-badge.grade-none {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        /* ---------- WEEK STRIP ---------- */
+        .week-strip {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .week-pill {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            border-radius: 12px;
+            padding: 8px 2px 7px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s var(--transition-spring);
+        }
+        .week-pill:active {
+            transform: scale(0.92);
+        }
+        .week-pill .wd {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+        }
+        .week-pill .dn {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .week-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--border-light);
+            margin-top: 1px;
+        }
+        .week-pill .dot.grade-a { background: var(--emerald); }
+        .week-pill .dot.grade-b { background: var(--gold); }
+        .week-pill .dot.grade-c { background: #d97706; }
+        .week-pill .dot.grade-d, .week-pill .dot.grade-f { background: var(--rose); }
+        .week-pill.is-today {
+            border-color: var(--accent-1);
+        }
+        .week-pill.active {
+            background: var(--accent-1);
+            border-color: var(--accent-1);
+        }
+        .week-pill.active .wd,
+        .week-pill.active .dn {
+            color: #fff;
+        }
+        .week-pill.future {
+            opacity: 0.35;
+            cursor: default;
+        }
+        .week-pill:disabled {
+            pointer-events: none;
+        }
+
+        /* ---------- LEVEL CARD ---------- */
+        .level-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-md);
+            border: 1.5px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: box-shadow 0.3s, transform 0.3s var(--transition-spring), background 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .level-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.04), transparent 60%, rgba(247, 127, 0, 0.03));
+            pointer-events: none;
+        }
+        .level-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        .level-badge {
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 24px var(--accent-glow);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s var(--transition-spring);
+        }
+        .level-badge .lvl {
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        .level-badge .lvl-label {
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.85;
+            margin-top: 1px;
+        }
+        .level-info {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            z-index: 1;
+        }
+        .level-info .rank {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        .level-info .rank .badge-icon {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 16px;
+        }
+        .level-info .xp-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .level-info .xp-row .to-next {
+            color: var(--text-muted);
+        }
+        .level-info .track {
+            margin-top: 10px;
+            height: 6px;
+            border-radius: 12px;
+            background: var(--border-light);
+            overflow: hidden;
+            position: relative;
+        }
+        .level-info .track .fill {
+            height: 100%;
+            border-radius: 12px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-1), var(--gold));
+            transition: width 0.8s var(--transition-smooth);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        /* ---------- STATS ROW ---------- */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 16px 8px 14px;
+            text-align: center;
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--transition-spring);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .stat-item:hover::after {
+            opacity: 1;
+        }
+        .stat-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .stat-item.prod::after {
+            background: var(--emerald);
+        }
+        .stat-item.neut::after {
+            background: var(--gold);
+        }
+        .stat-item.wast::after {
+            background: var(--rose);
+        }
+        .stat-item .icon {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .stat-item .num {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            transition: transform 0.2s var(--transition-spring);
+        }
+        .stat-item .num.pop {
+            transform: scale(1.2);
+        }
+        .stat-item .label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 4px;
+        }
+        .stat-item.prod .num {
+            color: var(--emerald);
+        }
+        .stat-item.neut .num {
+            color: var(--gold);
+        }
+        .stat-item.wast .num {
+            color: var(--rose);
+        }
+
+        /* ---------- GOAL CARD ---------- */
+        .goal-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            padding: 16px 18px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .goal-card.achieved {
+            border-color: var(--emerald);
+            box-shadow: 0 2px 14px rgba(6, 214, 160, 0.22);
+        }
+        .goal-empty {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .goal-empty .prompt {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .goal-empty .plus {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px dashed var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .goal-set {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .goal-status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid var(--border-light);
+            color: var(--text-muted);
+            transition: all 0.3s var(--transition-spring);
+        }
+        .goal-card.achieved .goal-status-icon {
+            border-color: var(--emerald);
+            background: rgba(6, 214, 160, 0.14);
+            color: var(--emerald);
+            transform: scale(1.08);
+        }
+        .goal-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .goal-text {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .goal-progress-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .goal-track {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-light);
+            overflow: hidden;
+        }
+        .goal-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--gold);
+            transition: width 0.4s var(--transition-smooth), background 0.3s;
+        }
+        .goal-card.achieved .goal-fill {
+            background: var(--emerald);
+        }
+        .goal-frac {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            letter-spacing: 0.02em;
+        }
+        .goal-card.achieved .goal-frac {
+            color: var(--emerald);
+        }
+        .goal-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .goal-actions button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .goal-actions button:active {
+            background: var(--border-light);
+        }
+        .goal-edit-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .goal-edit-row input[type="text"] {
+            width: 100%;
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-family: inherit;
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .goal-edit-row input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-1);
+        }
+        .goal-target-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .goal-target-row .lbl {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .goal-stepper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .goal-stepper button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-light);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .goal-stepper .val {
+            font-size: 15px;
+            font-weight: 800;
+            min-width: 20px;
+            text-align: center;
+        }
+        .goal-edit-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+        }
+        .goal-edit-buttons button {
+            flex: 1;
+            padding: 9px 0;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-light);
+            font-size: 12.5px;
+            font-weight: 700;
+            background: var(--bg-card-hover);
+            color: var(--text-secondary);
+        }
+        .goal-edit-buttons .save-btn {
+            background: var(--accent-1);
+            border-color: var(--accent-1);
+            color: #fff;
+        }
+
+        /* ---------- WINDOW BAR ---------- */
+        .window-bar {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s, box-shadow 0.2s;
+        }
+        .window-bar:hover {
+            box-shadow: var(--shadow-md);
+        }
+        .window-bar .label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .window-bar .range {
+            font-family: 'Inter', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+        .window-bar .range .accent {
+            color: var(--accent-1);
+        }
+        .window-bar .edit-btn {
+            background: var(--accent-1);
+            border: none;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            font-family: inherit;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .window-bar .edit-btn:hover {
+            background: var(--accent-2);
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .window-bar .edit-btn:active {
+            transform: scale(0.94);
+        }
+        /* ---------- BACKUP CARD ---------- */
+        .backup-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        .backup-card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .backup-card p {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .backup-card .backup-btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: var(--radius-xs);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+        }
+        .backup-card .backup-btn.export {
+            border: none;
+            background: var(--accent-1);
+            color: #fff;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .backup-card .backup-btn.export:hover {
+            background: var(--accent-2);
+        }
+        .backup-card .backup-btn.import {
+            border: 1.5px solid var(--accent-1);
+            background: transparent;
+            color: var(--accent-1);
+            margin-top: 10px;
+        }
+        .backup-card .backup-btn.import:hover {
+            background: var(--accent-glow);
+        }
+        .backup-card #backupStatus {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 8px;
+            min-height: 16px;
+        }
+        .window-bar .ghost-btn {
+            background: transparent;
+            border: 1.5px solid var(--border-light);
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            font-family: inherit;
+        }
+        .window-bar .ghost-btn:hover {
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+        .window-bar .ghost-btn:active {
+            transform: scale(0.94);
+        }
+        .window-bar .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ---------- ACHIEVEMENTS ROW ---------- */
+        .achievements-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 4px 0;
+        }
+        .achievement-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 4px 14px 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+        .achievement-badge.unlocked {
+            opacity: 1;
+            border-color: var(--gold);
+            background: var(--gold-glow);
+        }
+        .achievement-badge .ach-icon {
+            font-size: 16px;
+        }
+
+        /* ---------- HOUR GRID ---------- */
+        .hour-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: opacity 0.25s var(--transition-smooth);
+        }
+        .hour-grid.fade {
+            opacity: 0;
+        }
+
+        .hour-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s var(--transition-smooth);
+            transform: translateX(0);
+        }
+        .hour-card:hover {
+            border-color: #c8c0b0;
+            box-shadow: var(--shadow-md);
+            transform: translateX(2px);
+        }
+        .hour-card.locked .hour-head {
+            cursor: default;
+        }
+        .hour-card.locked:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(0);
+        }
+        .hour-card.locked .note {
+            color: var(--text-secondary);
+        }
+        .hour-card.locked .hour-chevron {
+            font-size: 13px;
+            opacity: 0.55;
+        }
+        .hour-card.shake {
+            animation: cardShake 0.4s ease;
+        }
+        @keyframes cardShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+        .hour-head {
+            display: flex;
+            align-items: stretch;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+            padding: 0 12px 0 0;
+            transition: background 0.2s;
+        }
+        .hour-head:hover {
+            background: var(--bg-card-hover);
+        }
+        .hour-time {
+            width: 64px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            border-right: 1.5px solid var(--border-light);
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        .hour-time .meridiem {
+            font-size: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+        .hour-body {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 12px 10px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+        }
+        .hour-body .note {
+            font-size: 13px;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .hour-body .note.empty {
+            font-style: italic;
+            color: var(--text-muted);
+            opacity: 0.6;
+            font-weight: 400;
+        }
+        .hour-body .stamp {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 14px;
+            border-radius: 40px;
+            display: inline-block;
+            width: fit-content;
+            transition: all 0.25s var(--transition-spring);
+            border: 1.5px solid transparent;
+            will-change: transform;
+        }
+        .hour-body .stamp.pop {
+            transform: scale(1.1);
+        }
+        .hour-body .stamp.placeholder {
+            background: var(--border-light);
+            border-color: var(--border-light);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .hour-body .stamp.graded-prod {
+            background: var(--emerald-glow);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+        .hour-body .stamp.graded-neut {
+            background: var(--gold-glow);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .hour-body .stamp.graded-wast {
+            background: var(--rose-glow);
+            border-color: var(--rose);
+            color: var(--rose);
+        }
+        .hour-chevron {
+            width: 30px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform 0.4s var(--transition-smooth);
+        }
+        .hour-card.open .hour-chevron {
+            transform: rotate(180deg);
+        }
+
+        .hour-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.32s var(--transition-smooth);
+            border-top: 1px solid transparent;
+        }
+        .hour-card.open .hour-detail {
+            border-top-color: var(--border-light);
+        }
+        .detail-inner {
+            overflow: hidden;
+            padding: 14px 16px 16px;
+            background: var(--bg-card-hover);
+        }
+        .detail-inner textarea {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            padding: 10px 12px;
+            resize: none;
+            min-height: 48px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        .detail-inner textarea:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .detail-inner textarea::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .grade-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .grade-btn {
+            flex: 1;
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 10px 4px;
+            border-radius: var(--radius-xs);
+            border: 1.5px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s var(--transition-spring);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .grade-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: #c8c0b0;
+        }
+        .grade-btn:active {
+            transform: scale(0.94);
+        }
+        .grade-btn.selected-prod {
+            background: var(--emerald-glow);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+        .grade-btn.selected-neut {
+            background: var(--gold-glow);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .grade-btn.selected-wast {
+            background: var(--rose-glow);
+            border-color: var(--rose);
+            color: var(--rose);
+        }
+
+        /* ---------- MODAL ---------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-sheet {
+            background: var(--bg-card);
+            border-radius: 28px 28px 28px 28px;
+            padding: 24px 24px 28px;
+            width: 100%;
+            max-width: 440px;
+            transform: translateY(20px) scale(0.96);
+            transition: transform 0.4s var(--transition-smooth);
+            box-shadow: var(--shadow-lg);
+            border: 1.5px solid var(--border-light);
+        }
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0) scale(1);
+        }
+        .modal-sheet .handle {
+            width: 40px;
+            height: 4px;
+            border-radius: 12px;
+            background: var(--border-light);
+            margin: 0 auto 16px;
+        }
+        .modal-sheet h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        .modal-sheet p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .modal-sheet .time-selects {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .modal-sheet .time-selects select {
+            flex: 1;
+            background: var(--bg-page);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            padding: 12px 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', monospace;
+            appearance: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .modal-sheet .time-selects select:focus {
+            outline: none;
+            border-color: var(--accent-1);
+        }
+        .modal-sheet .time-selects span {
+            color: var(--text-muted);
+            font-weight: 300;
+            font-size: 18px;
+        }
+        .modal-sheet .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .modal-sheet .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+        .modal-sheet .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .modal-sheet .btn-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.2s;
+        }
+        .modal-sheet .btn-close:hover {
+            color: var(--text-secondary);
+        }
+
+        /* ---------- ANALYTICS PANEL ---------- */
+        .analytics-toggle {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+        .analytics-toggle:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-1);
+        }
+        #streakToggle {
+            cursor: default;
+        }
+        #streakToggle:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--border-light);
+        }
+        .analytics-toggle .label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .analytics-toggle .arrow {
+            transition: transform 0.3s var(--transition-smooth);
+            font-size: 14px;
+        }
+        .analytics-toggle.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .analytics-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s var(--transition-smooth);
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        .analytics-inner {
+            overflow: hidden;
+            padding: 16px 20px 20px;
+        }
+        .analytics-inner .chart-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .analytics-inner .chart-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .analytics-inner .chart-bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            transition: height 0.6s var(--transition-smooth);
+            background: var(--accent-1);
+        }
+        .analytics-inner .chart-bar.prod {
+            background: var(--emerald);
+        }
+        .analytics-inner .chart-bar.neut {
+            background: var(--gold);
+        }
+        .analytics-inner .chart-bar.wast {
+            background: var(--rose);
+        }
+        .analytics-inner .chart-label {
+            font-size: 8px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .analytics-inner .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .analytics-inner .stats-grid .stat-mini {
+            text-align: center;
+            padding: 8px;
+            border-radius: var(--radius-xs);
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-light);
+        }
+        .analytics-inner .stats-grid .stat-mini .num {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .analytics-inner .stats-grid .stat-mini .lbl {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .analytics-inner .stats-grid .stat-mini.prod .num {
+            color: var(--emerald);
+        }
+        .analytics-inner .stats-grid .stat-mini.neut .num {
+            color: var(--gold);
+        }
+        .analytics-inner .stats-grid .stat-mini.wast .num {
+            color: var(--rose);
+        }
+        .analytics-inner .best-time {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding: 8px;
+            background: var(--bg-card-hover);
+            border-radius: var(--radius-xs);
+        }
+
+        /* ---------- STREAK HISTORY ---------- */
+        .streak-history {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-light);
+        }
+        /* ---------- STREAK POPUP ---------- */
+        .streak-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 26, 46, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .streak-popup-overlay.open {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        .streak-popup-sheet {
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            padding: 24px 22px 20px;
+            width: 100%;
+            max-width: 420px;
+            border: 1.5px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.92) translateY(12px);
+            opacity: 0;
+            transition: transform 0.35s var(--transition-spring), opacity 0.25s ease;
+        }
+        .streak-popup-overlay.open .streak-popup-sheet {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .streak-popup-sheet .btn-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 14px;
+            cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.2s;
+        }
+        .streak-popup-sheet .btn-close:hover {
+            color: var(--text-secondary);
+        }
+
+        .streak-history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .streak-history-head .sh-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .streak-history-head .sh-longest {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .streak-hero {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(247, 127, 0, 0.12), rgba(239, 71, 111, 0.08));
+            border: 1.5px solid rgba(247, 127, 0, 0.25);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+        .streak-hero .flame-big {
+            font-size: 28px;
+            line-height: 1;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(247, 127, 0, 0.35));
+        }
+        .streak-hero .flame-big.alive {
+            animation: flameFlicker 1.6s ease-in-out infinite;
+        }
+        @keyframes flameFlicker {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.06) rotate(-2deg); }
+            50% { transform: scale(0.97) rotate(1deg); }
+            75% { transform: scale(1.04) rotate(2deg); }
+        }
+        .streak-hero .hero-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .streak-hero .hero-num {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .streak-hero .hero-num span {
+            color: var(--gold);
+        }
+        .streak-hero .hero-sub {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .streak-hero .hero-track {
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .streak-hero .hero-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--rose));
+            transition: width 0.5s var(--transition-smooth);
+        }
+
+        .streak-weekday-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .streak-weekday-row span {
+            font-size: 8.5px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+        .streak-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .streak-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: var(--border-light);
+            position: relative;
+        }
+        .streak-cell.level-1 { background: rgba(6, 214, 160, 0.32); }
+        .streak-cell.level-2 { background: rgba(6, 214, 160, 0.58); }
+        .streak-cell.level-3 { background: rgba(6, 214, 160, 0.82); }
+        .streak-cell.level-4 { background: var(--emerald); }
+        .streak-cell.today {
+            box-shadow: 0 0 0 1.5px var(--accent-1);
+        }
+        .streak-cell.future {
+            opacity: 0.35;
+        }
+        .streak-cell.tail::after {
+            content: '🔥';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+        }
+
+        .streak-milestones {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+        .milestone-badge {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            background: var(--bg-card-hover);
+            border: 1.5px solid var(--border-light);
+            min-width: 52px;
+        }
+        .milestone-badge .m-icon {
+            font-size: 15px;
+            filter: grayscale(1) opacity(0.4);
+        }
+        .milestone-badge .m-label {
+            font-size: 8.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .milestone-badge.reached {
+            border-color: var(--gold);
+            background: rgba(247, 127, 0, 0.1);
+        }
+        .milestone-badge.reached .m-icon {
+            filter: none;
+        }
+        .milestone-badge.reached .m-label {
+            color: var(--gold);
+        }
+
+        /* ---------- FOOTER ---------- */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            padding-top: 6px;
+            opacity: 0.5;
+            font-weight: 600;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 500px) {
+            body {
+                padding: 16px 10px 30px;
+            }
+            .header-left .greeting {
+                font-size: 20px;
+            }
+            .level-card {
+                padding: 16px 18px;
+                gap: 14px;
+            }
+            .level-badge {
+                width: 60px;
+                height: 60px;
+            }
+            .level-badge .lvl {
+                font-size: 22px;
+            }
+            .level-info .rank {
+                font-size: 17px;
+            }
+            .stats {
+                gap: 8px;
+            }
+            .stat-item .num {
+                font-size: 24px;
+            }
+            .hour-time {
+                width: 54px;
+                font-size: 16px;
+            }
+            .hour-body .note {
+                font-size: 12px;
+            }
+            .grade-btn {
+                font-size: 9.5px;
+                padding: 8px 4px;
+            }
+            .day-nav .day-label {
+                font-size: 14px;
+            }
+            .analytics-inner .chart-row {
+                height: 60px;
+            }
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .hour-card {
+            animation: slideUp 0.4s var(--transition-smooth) both;
+        }
+        .hour-card:nth-child(1) {
+            animation-delay: 0.02s;
+        }
+        .hour-card:nth-child(2) {
+            animation-delay: 0.04s;
+        }
+        .hour-card:nth-child(3) {
+            animation-delay: 0.06s;
+        }
+        .hour-card:nth-child(4) {
+            animation-delay: 0.08s;
+        }
+        .hour-card:nth-child(5) {
+            animation-delay: 0.10s;
+        }
+        .hour-card:nth-child(6) {
+            animation-delay: 0.12s;
+        }
+        .hour-card:nth-child(7) {
+            animation-delay: 0.14s;
+        }
+        .hour-card:nth-child(8) {
+            animation-delay: 0.16s;
+        }
+        .hour-card:nth-child(9) {
+            animation-delay: 0.18s;
+        }
+        .hour-card:nth-child(10) {
+            animation-delay: 0.20s;
+        }
+        .hour-card:nth-child(11) {
+            animation-delay: 0.22s;
+        }
+        .hour-card:nth-child(12) {
+            animation-delay: 0.24s;
+        }
+        .hour-card:nth-child(13) {
+            animation-delay: 0.26s;
+        }
+        .hour-card:nth-child(14) {
+            animation-delay: 0.28s;
+        }
+        .hour-card:nth-child(15) {
+            animation-delay: 0.30s;
+        }
+        .hour-card:nth-child(16) {
+            animation-delay: 0.32s;
+        }
+
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 var(--accent-glow);
+            }
+            50% {
+                box-shadow: 0 0 0 8px var(--accent-glow);
+            }
+        }
+        .level-badge.pulse {
+            animation: pulseGlow 0.6s ease;
+        }
+        @keyframes confettiDrop {
+            0% {
+                transform: translateY(-20px) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(200px) rotate(720deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+        .confetti-piece {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3000;
+            animation: confettiDrop 1.5s ease-in forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ONBOARDING -->
+        <div class="onboarding-overlay" id="onboardingOverlay">
+            <div class="onboarding-card">
+                <div class="icon" id="onboardIcon">⏳</div>
+                <h2 id="onboardTitle">Welcome to Hourly</h2>
+                <p id="onboardDesc">Track your hours, grade your focus, and level up your productivity. Every hour counts.</p>
+                <div class="steps" id="onboardSteps">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <button class="btn-primary" id="onboardNext">Get Started</button>
+                <button class="btn-skip" id="onboardSkip">Skip</button>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <div class="greeting">Today's Hours</div>
+            </div>
+            <div class="header-right">
+                <button class="top-btn theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+                <div class="streak-pill" id="streakPillBtn" role="button">
+                    <span class="flame">🔥</span>
+                    <span id="streakCount">0</span> day streak
+                </div>
+                <button class="top-btn" id="resetBtn" title="Reset all data">⟳</button>
+            </div>
+        </header>
+
+        <!-- DAY NAV -->
+        <div class="day-nav">
+            <button class="nav-btn" id="prevDayBtn">‹</button>
+            <span class="day-label" id="dayLabel">
+                <span id="dayDisplay">Today</span>
+                <span class="grade-badge grade-none" id="dayGradeBadge">–</span>
+            </span>
+            <button class="nav-btn" id="nextDayBtn">›</button>
+        </div>
+
+        <!-- LEVEL CARD -->
+        <div class="level-card">
+            <div class="level-badge" id="levelBadge">
+                <span class="lvl" id="lvlNum">1</span>
+                <span class="lvl-label">LVL</span>
+            </div>
+            <div class="level-info">
+                <div class="rank" id="rankTitle">ROOKIE <span class="badge-icon" id="rankBadge">🌱</span></div>
+                <div class="xp-row">
+                    <span id="xpNow">0 XP</span>
+                    <span class="to-next" id="xpNext">100 XP to Lv.2</span>
+                </div>
+                <div class="track"><div class="fill" id="xpFill"></div></div>
+            </div>
+        </div>
+
+        <!-- ACHIEVEMENTS -->
+        <div class="achievements-row" id="achievementsRow"></div>
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="stat-item prod">
+                <span class="icon">⚡</span>
+                <div class="num" id="cntProd">0</div>
+                <div class="label">Productive</div>
+            </div>
+            <div class="stat-item neut">
+                <span class="icon">◎</span>
+                <div class="num" id="cntNeut">0</div>
+                <div class="label">Neutral</div>
+            </div>
+            <div class="stat-item wast">
+                <span class="icon">✕</span>
+                <div class="num" id="cntWast">0</div>
+                <div class="label">Wasted</div>
+            </div>
+        </div>
+
+        <!-- GOAL -->
+        <div class="goal-card" id="goalCard"></div>
+
+        <!-- STREAK PANEL (opened only via the header pill) -->
+        <div class="streak-popup-overlay" id="streakPanel">
+            <div class="streak-popup-sheet">
+                <div class="streak-history-head">
+                    <span class="sh-title">🔥 Streak</span>
+                    <span class="sh-longest" id="shLongest">Longest: 0 days</span>
+                </div>
+                <div class="streak-hero" id="streakHero">
+                    <div class="flame-big" id="streakHeroFlame">🔥</div>
+                    <div class="hero-body">
+                        <div class="hero-num" id="streakHeroNum">0 day streak</div>
+                        <div class="hero-sub" id="streakHeroSub">Log 3 productive hours to start one</div>
+                        <div class="hero-track"><div class="hero-fill" id="streakHeroFill" style="width:0%"></div></div>
+                    </div>
+                </div>
+                <div class="streak-milestones" id="streakMilestones"></div>
+                <button class="btn-close" id="streakCloseBtn">Close</button>
+            </div>
+        </div>
+
+        <!-- ANALYTICS TOGGLE -->
+        <div class="analytics-toggle" id="analyticsToggle">
+            <span class="label">📊 7-Day Insights</span>
+            <span class="arrow">▾</span>
+        </div>
+        <div class="analytics-panel" id="analyticsPanel">
+            <div class="analytics-inner">
+                <div class="chart-row" id="chartRow"></div>
+                <div class="stats-grid" id="analyticsStats">
+                    <div class="stat-mini prod"><div class="num" id="analyticsProd">0</div><div class="lbl">Productive</div></div>
+                    <div class="stat-mini neut"><div class="num" id="analyticsNeut">0</div><div class="lbl">Neutral</div></div>
+                    <div class="stat-mini wast"><div class="num" id="analyticsWast">0</div><div class="lbl">Wasted</div></div>
+                </div>
+                <div class="best-time" id="bestTime">⏰ Your most productive hour: --</div>
+            </div>
+        </div>
+
+        <!-- WINDOW BAR -->
+        <div class="window-bar">
+            <span class="label">⏳ Active Window</span>
+            <span class="range" id="winLabel"><span class="accent">07:00</span> – <span class="accent">23:00</span></span>
+            <button class="edit-btn" id="editWindowBtn">Edit</button>
+        </div>
+
+        <!-- BACKUP -->
+        <div class="backup-card">
+            <h3>💾 Backup</h3>
+            <p>Save a copy of your hours, streaks, and XP so you never lose progress.</p>
+            <button class="backup-btn export" id="exportBackupBtn">📤 Export Backup</button>
+            <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" />
+            <button class="backup-btn import" id="importBackupBtn">📥 Import Backup</button>
+            <div id="backupStatus"></div>
+        </div>
+
+        <!-- HOUR GRID -->
+        <div class="hour-grid" id="hourGrid"></div>
+
+        <div class="footer">tap an hour · log your focus · level up</div>
+
+        <!-- MODAL -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-sheet">
+                <div class="handle"></div>
+                <h3>Set your day window</h3>
+                <p>Hours outside this range won't be shown.</p>
+                <div class="time-selects">
+                    <select id="startSelect"></select>
+                    <span>–</span>
+                    <select id="endSelect"></select>
+                </div>
+                <button class="btn-primary" id="modalApplyBtn">Apply</button>
+                <button class="btn-close" id="modalCloseBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            const DEFAULT_START = 7;
+            const DEFAULT_END = 23;
+            const XP_VALUES = { prod: 10, neut: 3, wast: 0 };
+            const LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000, 5000];
+            const RANK_TITLES = ['ROOKIE', 'STARTER', 'GRINDER', 'OPERATOR', 'MACHINE', 'RELENTLESS', 'LEGEND', 'MYTHIC',
+                'ASCENDED', 'TRANSCENDENT', 'IMMORTAL'
+            ];
+            const RANK_ICONS = ['🌱', '🌿', '⚡', '🔧', '🏗️', '🔥', '👑', '🌟', '✨', '💫', '♾️'];
+
+            // Achievements config
+            const ACHIEVEMENTS = [
+                { id: 'first_log', label: 'First Log', icon: '📝', check: s => s.totalGraded >= 1 },
+                { id: 'perfect_day', label: 'Perfect Day', icon: '⭐', check: s => s.todayProd > 0 && s.todayWast === 0 &&
+                        s.todayGraded >= 4 },
+                { id: 'early_bird', label: 'Early Bird', icon: '🌅', check: s => s.earlyHourLogged },
+                { id: 'night_owl', label: 'Night Owl', icon: '🦉', check: s => s.lateHourLogged },
+                { id: 'streak_3', label: '3-Day Streak', icon: '🔥', check: s => s.streak >= 3 },
+                { id: 'streak_7', label: '7-Day Streak', icon: '⚡', check: s => s.streak >= 7 },
+                { id: 'level_5', label: 'Level 5', icon: '🚀', check: s => s.level >= 5 },
+                { id: 'level_10', label: 'Level 10', icon: '💎', check: s => s.level >= 10 },
+            ];
+
+            // ---------- STATE ----------
+            let startHour = DEFAULT_START;
+            let endHour = DEFAULT_END;
+            let state = {};
+            let totalXP = 0;
+            let level = 1;
+            let prevLevel = 1;
+            let streak = 0;
+            let isInitialLoad = true;
+            let currentDateStr = formatDate(new Date());
+            let isTransitioning = false;
+            let unlockedAchievements = new Set();
+            let theme = 'light';
+            let onboardStep = 0;
+            const onboardSteps = [
+                { icon: '⏳', title: 'Welcome to Hourly', desc: 'Track your hours, grade your focus, and level up your productivity. Every hour counts.' },
+                { icon: '⚡', title: 'Grade Your Hours', desc: 'Tap any hour, log what you did, and grade it as Productive, Neutral, or Wasted. Each grade gives you XP.' },
+                { icon: '🏆', title: 'Level Up & Earn Badges', desc: 'Gain XP to level up and unlock achievements. Watch your productivity soar!' },
+            ];
+
+            // DOM refs
+            const grid = document.getElementById('hourGrid');
+            const lvlNum = document.getElementById('lvlNum');
+            const rankTitle = document.getElementById('rankTitle');
+            const rankBadge = document.getElementById('rankBadge');
+            const xpFill = document.getElementById('xpFill');
+            const xpNow = document.getElementById('xpNow');
+            const xpNext = document.getElementById('xpNext');
+            const cntProd = document.getElementById('cntProd');
+            const cntNeut = document.getElementById('cntNeut');
+            const cntWast = document.getElementById('cntWast');
+            const goalCard = document.getElementById('goalCard');
+            const winLabel = document.getElementById('winLabel');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const startSelect = document.getElementById('startSelect');
+            const endSelect = document.getElementById('endSelect');
+            const modalApplyBtn = document.getElementById('modalApplyBtn');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const editWindowBtn = document.getElementById('editWindowBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const levelBadge = document.getElementById('levelBadge');
+            const dayDisplay = document.getElementById('dayDisplay');
+            const dayGradeBadge = document.getElementById('dayGradeBadge');
+            const prevDayBtn = document.getElementById('prevDayBtn');
+            const nextDayBtn = document.getElementById('nextDayBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const onboardingOverlay = document.getElementById('onboardingOverlay');
+            const onboardNext = document.getElementById('onboardNext');
+            const onboardSkip = document.getElementById('onboardSkip');
+            const onboardIcon = document.getElementById('onboardIcon');
+            const onboardTitle = document.getElementById('onboardTitle');
+            const onboardDesc = document.getElementById('onboardDesc');
+            const onboardStepsDots = document.getElementById('onboardSteps');
+            const achievementsRow = document.getElementById('achievementsRow');
+            const analyticsToggle = document.getElementById('analyticsToggle');
+            const analyticsPanel = document.getElementById('analyticsPanel');
+            const chartRow = document.getElementById('chartRow');
+            const analyticsProd = document.getElementById('analyticsProd');
+            const analyticsNeut = document.getElementById('analyticsNeut');
+            const analyticsWast = document.getElementById('analyticsWast');
+            const bestTime = document.getElementById('bestTime');
+
+            // ---------- HELPERS ----------
+            function fmtHour(h) {
+                const period = h >= 12 ? 'PM' : 'AM';
+                let hr = h % 12;
+                if (hr === 0) hr = 12;
+                return { h: String(hr).padStart(2, '0'), period };
+            }
+
+            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+            function escapeHtml(str) {
+                const d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
+            }
+
+            function formatDate(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function getTodayStr() {
+                return formatDate(new Date());
+            }
+
+            function getLevel(xp) {
+                let lvl = 1;
+                for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+                    if (xp >= LEVEL_THRESHOLDS[i]) lvl = i + 1;
+                }
+                return lvl;
+            }
+
+            function getRank(lvl) {
+                const idx = Math.min(lvl - 1, RANK_TITLES.length - 1);
+                return RANK_TITLES[idx];
+            }
+
+            function getRankIcon(lvl) {
+                const idx = Math.min(lvl - 1, RANK_ICONS.length - 1);
+                return RANK_ICONS[idx];
+            }
+
+            function getXPFloor(lvl) {
+                return LEVEL_THRESHOLDS[Math.min(lvl - 1, LEVEL_THRESHOLDS.length - 1)] || 0;
+            }
+
+            function getXPCeil(lvl) {
+                const next = LEVEL_THRESHOLDS[Math.min(lvl, LEVEL_THRESHOLDS.length - 1)];
+                return next !== undefined ? next : LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1] + 500;
+            }
+
+            function getDayData(dateStr) {
+                if (!state[dateStr]) {
+                    state[dateStr] = { hours: {} };
+                }
+                if (!state[dateStr].goal) {
+                    state[dateStr].goal = { text: '', target: 0 };
+                }
+                return state[dateStr];
+            }
+
+            function getHourEntry(dateStr, hour) {
+                const day = getDayData(dateStr);
+                if (!day.hours[hour]) {
+                    day.hours[hour] = { text: '', grade: null };
+                }
+                return day.hours[hour];
+            }
+
+            function getDateDaysAgo(n) {
+                const d = new Date();
+                d.setDate(d.getDate() - n);
+                return formatDate(d);
+            }
+
+            // ---------- STORAGE ----------
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem('hourly_state_v3');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        state = parsed.state || {};
+                        startHour = parsed.startHour ?? DEFAULT_START;
+                        endHour = parsed.endHour ?? DEFAULT_END;
+                        totalXP = parsed.totalXP ?? 0;
+                        streak = parsed.streak ?? 0;
+                        unlockedAchievements = new Set(parsed.unlockedAchievements || []);
+                        theme = parsed.theme || 'light';
+                        level = getLevel(totalXP);
+                        prevLevel = level;
+                        return true;
+                    }
+                } catch (_) { /* ignore */ }
+                return false;
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem('hourly_state_v3', JSON.stringify({
+                        state,
+                        startHour,
+                        endHour,
+                        totalXP,
+                        streak,
+                        unlockedAchievements: [...unlockedAchievements],
+                        theme,
+                    }));
+                } catch (_) { /* ignore */ }
+                scheduleSilentBackup();
+            }
+
+            // ---------- SILENT BACKGROUND BACKUP ----------
+            function buildBackupPayload() {
+                return JSON.stringify({
+                    app: 'hourglass',
+                    exportedAt: new Date().toISOString(),
+                    data: {
+                        state,
+                        startHour,
+                        endHour,
+                        totalXP,
+                        streak,
+                        unlockedAchievements: [...unlockedAchievements],
+                        theme,
+                    },
+                }, null, 2);
+            }
+
+            let backupDebounceTimer = null;
+            function scheduleSilentBackup() {
+                const LN = window.Capacitor && window.Capacitor.Plugins;
+                if (!(LN && LN.Filesystem)) return; // no-op outside the native app
+                clearTimeout(backupDebounceTimer);
+                backupDebounceTimer = setTimeout(async () => {
+                    try {
+                        await LN.Filesystem.writeFile({
+                            path: 'hourglass-autobackup.json',
+                            data: buildBackupPayload(),
+                            directory: 'EXTERNAL',
+                            encoding: 'utf8',
+                        });
+                    } catch (_) { /* silent, non-critical */ }
+                }, 3000);
+            }
+
+            // ---------- MANUAL EXPORT / IMPORT ----------
+            async function exportBackup() {
+                const statusEl = document.getElementById('backupStatus');
+                if (!isNative()) {
+                    if (statusEl) statusEl.textContent = "Export only works in the installed app — you're viewing this in a browser.";
+                    return;
+                }
+                const LN = window.Capacitor && window.Capacitor.Plugins;
+                if (!LN || !LN.Filesystem || !LN.Share) {
+                    if (statusEl) statusEl.textContent = "Backup isn't set up in this build yet — reinstall the latest version of the app.";
+                    return;
+                }
+                try {
+                    const fileName = `hourly-backup-${getTodayStr()}.json`;
+                    const written = await LN.Filesystem.writeFile({ path: fileName, data: buildBackupPayload(),
+                        directory: 'CACHE', encoding: 'utf8' });
+                    await LN.Share.share({ title: 'Hourly Backup', text: 'Your Hourly data backup',
+                        url: written.uri, dialogTitle: 'Save your backup' });
+                    if (statusEl) statusEl.textContent = 'Backup ready — choose where to save it.';
+                } catch (e) {
+                    if (statusEl) statusEl.textContent = 'Export failed. Try again.';
+                }
+            }
+
+            function importBackupFile(file) {
+                const statusEl = document.getElementById('backupStatus');
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(reader.result);
+                    } catch (_) {
+                        if (statusEl) statusEl.textContent = "Couldn't read that file — make sure it's a Hourly backup JSON.";
+                        return;
+                    }
+                    const data = (parsed && parsed.data) ? parsed.data : parsed;
+                    if (!data || typeof data !== 'object' || typeof data.state !== 'object') {
+                        if (statusEl) statusEl.textContent = "That file doesn't look like a valid Hourly backup.";
+                        return;
+                    }
+                    const ok = confirm('Importing will overwrite your current data on this device. Continue?');
+                    if (!ok) {
+                        if (statusEl) statusEl.textContent = 'Import cancelled.';
+                        return;
+                    }
+                    state = data.state || {};
+                    startHour = data.startHour ?? DEFAULT_START;
+                    endHour = data.endHour ?? DEFAULT_END;
+                    totalXP = data.totalXP ?? 0;
+                    streak = data.streak ?? 0;
+                    unlockedAchievements = new Set(data.unlockedAchievements || []);
+                    theme = data.theme || 'light';
+                    level = getLevel(totalXP);
+                    prevLevel = level;
+                    const today = getTodayStr();
+                    if (!state[today]) state[today] = { hours: {} };
+                    currentDateStr = today;
+                    document.documentElement.setAttribute('data-theme', theme);
+                    if (themeToggle) themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+                    populateSelects();
+                    renderGrid();
+                    for (let h = startHour; h < endHour; h++) {
+                        const card = grid.querySelector(`.hour-card[data-hour="${h}"]`);
+                        if (card) {
+                            const entry = getHourEntry(currentDateStr, h);
+                            if (entry.text) card.querySelector('textarea').value = entry.text;
+                            updateGradeUI(card, h);
+                            updateNote(card, h);
+                        }
+                    }
+                    recomputeStatsAndUI();
+                    if (statusEl) statusEl.textContent = 'Backup imported successfully.';
+                };
+                reader.onerror = () => { if (statusEl) statusEl.textContent = "Couldn't read that file."; };
+                reader.readAsText(file);
+            }
+
+            // ---------- CONFETTI ----------
+            function fireConfetti(count = 30) {
+                const colors = ['#4361ee', '#f77f00', '#06d6a0', '#ef476f', '#fbbf24', '#a78bfa', '#60a5fa'];
+                for (let i = 0; i < count; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'confetti-piece';
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const size = 6 + Math.random() * 10;
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 0.8;
+                    const dur = 1.2 + Math.random() * 1.2;
+                    el.style.cssText = `
+                            left:${left}%; top:-10px;
+                            width:${size}px; height:${size * (0.5 + Math.random() * 0.8)}px;
+                            background:${color};
+                            border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+                            animation-delay:${delay}s;
+                            animation-duration:${dur}s;
+                        `;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), (delay + dur) * 1000 + 100);
+                }
+            }
+
+            // ---------- RENDER ----------
+            function openHourCard(card) {
+                card._isOpen = true;
+                card.classList.add('open');
+                const detail = card.querySelector('.hour-detail');
+                if (detail) {
+                    detail.style.maxHeight = detail.scrollHeight + 'px';
+                }
+            }
+
+            function closeHourCard(card) {
+                card._isOpen = false;
+                card.classList.remove('open');
+                const detail = card.querySelector('.hour-detail');
+                if (detail) {
+                    detail.style.maxHeight = '0px';
+                }
+            }
+
+            const EDIT_GRACE_MINUTES = 20;
+
+            function isHourLocked(dateStr, h) {
+                const today = getTodayStr();
+                if (dateStr !== today) return true; // any day but today is fully locked
+                const blockEnd = new Date(dateStr + 'T00:00:00');
+                blockEnd.setHours(h + 1, EDIT_GRACE_MINUTES, 0, 0);
+                return new Date() >= blockEnd;
+            }
+
+            function applyCardLockState(card, h, locked) {
+                const wasLocked = card.classList.contains('locked');
+                card.classList.toggle('locked', locked);
+                const chevron = card.querySelector('.hour-chevron');
+                if (chevron && !card._isOpen) chevron.textContent = locked ? '🔒' : '▾';
+                const textarea = card.querySelector('textarea');
+                if (textarea) textarea.readOnly = locked;
+                card.querySelectorAll('.grade-btn').forEach(b => b.disabled = locked);
+                if (locked && !wasLocked && card._isOpen) {
+                    closeHourCard(card);
+                }
+            }
+
+            function refreshHourLocks() {
+                if (currentDateStr !== getTodayStr()) return;
+                grid.querySelectorAll('.hour-card').forEach(card => {
+                    const h = parseInt(card.dataset.hour, 10);
+                    applyCardLockState(card, h, isHourLocked(currentDateStr, h));
+                });
+            }
+            setInterval(refreshHourLocks, 30000);
+
+            function renderGrid() {
+                grid.innerHTML = '';
+                const dayData = getDayData(currentDateStr);
+                const hours = dayData.hours || {};
+
+                for (let h = startHour; h < endHour; h++) {
+                    const { h: hh, period } = fmtHour(h);
+                    const entry = hours[h] || { text: '', grade: null };
+                    const grade = entry.grade || null;
+                    const text = (entry.text || '').trim();
+                    const isGraded = !!grade;
+                    const gradeClass = isGraded ? `graded-${grade}` : '';
+                    const locked = isHourLocked(currentDateStr, h);
+
+                    const stampHTML = isGraded ?
+                        `<span class="stamp ${gradeClass}">${grade.charAt(0).toUpperCase() + grade.slice(1)}</span>` :
+                        `<span class="stamp placeholder">Ungraded</span>`;
+
+                    const noteText = text ? escapeHtml(text) : 'No entry yet';
+                    const noteEmpty = !text ? 'empty' : '';
+
+                    const card = document.createElement('div');
+                    card.className = 'hour-card' + (locked ? ' locked' : '');
+                    card.dataset.hour = h;
+                    card._isOpen = false;
+
+                    card.innerHTML = `
+                            <div class="hour-head">
+                                <div class="hour-time">
+                                    ${hh}
+                                    <span class="meridiem">${period}</span>
+                                </div>
+                                <div class="hour-body">
+                                    <div class="note ${noteEmpty}">${noteText}</div>
+                                    <div>${stampHTML}</div>
+                                </div>
+                                <div class="hour-chevron">${locked ? '🔒' : '▾'}</div>
+                            </div>
+                            <div class="hour-detail">
+                                <div class="detail-inner">
+                                    <textarea placeholder="What did you do this hour?" ${locked ? 'readonly' : ''}>${escapeHtml(text)}</textarea>
+                                    <div class="grade-group">
+                                        <button class="grade-btn ${grade === 'prod' ? 'selected-prod' : ''}" data-grade="prod" ${locked ? 'disabled' : ''}>⚡ Productive</button>
+                                        <button class="grade-btn ${grade === 'neut' ? 'selected-neut' : ''}" data-grade="neut" ${locked ? 'disabled' : ''}>◎ Neutral</button>
+                                        <button class="grade-btn ${grade === 'wast' ? 'selected-wast' : ''}" data-grade="wast" ${locked ? 'disabled' : ''}>✕ Wasted</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    grid.appendChild(card);
+
+                    const head = card.querySelector('.hour-head');
+                    const textarea = card.querySelector('textarea');
+                    const gradeBtns = card.querySelectorAll('.grade-btn');
+
+                    head.addEventListener('click', (e) => {
+                        if (isHourLocked(currentDateStr, h)) {
+                            card.classList.remove('shake');
+                            void card.offsetWidth;
+                            card.classList.add('shake');
+                            return;
+                        }
+                        if (e.target.closest('.grade-btn') || e.target.closest('textarea')) return;
+                        if (card._isOpen) {
+                            closeHourCard(card);
+                            return;
+                        }
+                        document.querySelectorAll('.hour-card.open').forEach(other => {
+                            if (other !== card) closeHourCard(other);
+                        });
+                        openHourCard(card);
+                        requestAnimationFrame(() => {
+                            const rect = card.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight;
+                            if (rect.bottom > viewportHeight - 20) {
+                                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    });
+
+                    textarea.addEventListener('click', (e) => e.stopPropagation());
+                    textarea.addEventListener('input', () => {
+                        const entry = getHourEntry(currentDateStr, h);
+                        entry.text = textarea.value;
+                        saveState();
+                        updateNote(card, h);
+                    });
+
+                    // Keyboard shortcuts: 1, 2, 3 for grades
+                    textarea.addEventListener('keydown', (e) => {
+                        if (e.key === '1') { e.preventDefault();
+                            gradeBtns[0].click(); }
+                        if (e.key === '2') { e.preventDefault();
+                            gradeBtns[1].click(); }
+                        if (e.key === '3') { e.preventDefault();
+                            gradeBtns[2].click(); }
+                    });
+
+                    gradeBtns.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const gradeVal = btn.dataset.grade;
+                            const entry = getHourEntry(currentDateStr, h);
+                            const prevGrade = entry.grade;
+                            const newGrade = prevGrade === gradeVal ? null : gradeVal;
+                            entry.grade = newGrade;
+                            recalcTotalXP();
+                            updateGradeUI(card, h);
+                            const stamp = card.querySelector('.stamp');
+                            if (stamp) {
+                                stamp.classList.remove('pop');
+                                void stamp.offsetWidth;
+                                stamp.classList.add('pop');
+                                setTimeout(() => stamp.classList.remove('pop'), 300);
+                            }
+                            // Haptic feedback
+                            if (navigator.vibrate) navigator.vibrate(10);
+                            recomputeStatsAndUI();
+                            saveState();
+                            if (newGrade) {
+                                closeHourCard(card);
+                            }
+                        });
+                    });
+                }
+            }
+
+            function updateNote(card, h) {
+                const note = card.querySelector('.note');
+                const dayData = getDayData(currentDateStr);
+                const entry = dayData.hours[h] || { text: '' };
+                const text = (entry.text || '').trim();
+                if (text) {
+                    note.textContent = text;
+                    note.classList.remove('empty');
+                } else {
+                    note.textContent = 'No entry yet';
+                    note.classList.add('empty');
+                }
+            }
+
+            function updateGradeUI(card, h) {
+                const dayData = getDayData(currentDateStr);
+                const entry = dayData.hours[h] || { grade: null };
+                const grade = entry.grade;
+                const stamp = card.querySelector('.stamp');
+                const btns = card.querySelectorAll('.grade-btn');
+
+                btns.forEach(b => {
+                    b.classList.remove('selected-prod', 'selected-neut', 'selected-wast');
+                });
+
+                if (grade) {
+                    const label = grade.charAt(0).toUpperCase() + grade.slice(1);
+                    stamp.className = `stamp graded-${grade}`;
+                    stamp.textContent = label;
+                    card.querySelector(`.grade-btn.${grade}`).classList.add(`selected-${grade}`);
+                } else {
+                    stamp.className = 'stamp placeholder';
+                    stamp.textContent = 'Ungraded';
+                }
+            }
+
+            // ---------- RECALC TOTAL XP ----------
+            function recalcTotalXP() {
+                let xp = 0;
+                for (const dateStr in state) {
+                    const day = state[dateStr];
+                    if (day.hours) {
+                        for (const hour in day.hours) {
+                            const entry = day.hours[hour];
+                            if (entry.grade === 'prod') xp += XP_VALUES.prod;
+                            else if (entry.grade === 'neut') xp += XP_VALUES.neut;
+                            else if (entry.grade === 'wast') xp += XP_VALUES.wast;
+                        }
+                    }
+                }
+                totalXP = xp;
+            }
+
+            // ---------- COMPUTE DAILY STATS ----------
+            function computeDayStats(dateStr) {
+                const day = getDayData(dateStr);
+                let prod = 0,
+                    neut = 0,
+                    wast = 0;
+                let earlyLogged = false,
+                    lateLogged = false;
+                for (const hour in day.hours) {
+                    const entry = day.hours[hour];
+                    const h = parseInt(hour);
+                    if (entry.grade === 'prod') prod++;
+                    else if (entry.grade === 'neut') neut++;
+                    else if (entry.grade === 'wast') wast++;
+                    if (entry.grade && h >= 5 && h <= 8) earlyLogged = true;
+                    if (entry.grade && h >= 21 && h <= 23) lateLogged = true;
+                }
+                const graded = prod + neut + wast;
+                let grade = null;
+                let gradeLabel = '–';
+                let gradeClass = 'grade-none';
+                if (graded > 0) {
+                    const pct = prod / graded;
+                    if (pct >= 0.8) { grade = 'A';
+                        gradeLabel = 'A';
+                        gradeClass = 'grade-a'; } else if (pct >= 0.6) { grade = 'B';
+                        gradeLabel = 'B';
+                        gradeClass = 'grade-b'; } else if (pct >= 0.4) { grade = 'C';
+                        gradeLabel = 'C';
+                        gradeClass = 'grade-c'; } else if (pct >= 0.2) { grade = 'D';
+                        gradeLabel = 'D';
+                        gradeClass = 'grade-d'; } else { grade = 'F';
+                        gradeLabel = 'F';
+                        gradeClass = 'grade-f'; }
+                }
+                return { prod, neut, wast, graded, grade, gradeLabel, gradeClass, earlyLogged, lateLogged };
+            }
+
+            // ---------- COMPUTE ACHIEVEMENTS ----------
+            function computeAchievements() {
+                const todayStats = computeDayStats(getTodayStr());
+                const context = {
+                    totalGraded: 0,
+                    todayProd: todayStats.prod,
+                    todayWast: todayStats.wast,
+                    todayGraded: todayStats.graded,
+                    earlyHourLogged: todayStats.earlyLogged,
+                    lateHourLogged: todayStats.lateLogged,
+                    streak: streak,
+                    level: level,
+                };
+                // total graded across all days
+                let totalGraded = 0;
+                for (const dateStr in state) {
+                    const stats = computeDayStats(dateStr);
+                    totalGraded += stats.graded;
+                }
+                context.totalGraded = totalGraded;
+
+                let newUnlocked = false;
+                ACHIEVEMENTS.forEach(ach => {
+                    if (!unlockedAchievements.has(ach.id) && ach.check(context)) {
+                        unlockedAchievements.add(ach.id);
+                        newUnlocked = true;
+                        // Show toast-style notification
+                        showAchievementToast(ach);
+                        fireConfetti(20);
+                    }
+                });
+                if (newUnlocked) saveState();
+                renderAchievements();
+            }
+
+            function showAchievementToast(ach) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+                        background: var(--bg-card); border: 2px solid var(--gold);
+                        border-radius: var(--radius-sm); padding: 14px 24px;
+                        box-shadow: var(--shadow-lg); z-index: 3000;
+                        display: flex; align-items: center; gap: 12px;
+                        animation: slideUp 0.5s var(--transition-spring);
+                        max-width: 90%;
+                        backdrop-filter: blur(6px);
+                    `;
+                toast.innerHTML = `
+                        <span style="font-size:28px;">${ach.icon}</span>
+                        <div><div style="font-weight:700;font-size:15px;">Achievement Unlocked!</div>
+                        <div style="color:var(--text-secondary);font-size:13px;">${ach.label}</div></div>
+                    `;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.transition = 'opacity 0.5s, transform 0.5s';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(20px)';
+                    setTimeout(() => toast.remove(), 600);
+                }, 3000);
+            }
+
+            function renderAchievements() {
+                achievementsRow.innerHTML = '';
+                ACHIEVEMENTS.forEach(ach => {
+                    const unlocked = unlockedAchievements.has(ach.id);
+                    const el = document.createElement('span');
+                    el.className = `achievement-badge ${unlocked ? 'unlocked' : ''}`;
+                    el.innerHTML = `<span class="ach-icon">${ach.icon}</span> ${ach.label}`;
+                    achievementsRow.appendChild(el);
+                });
+            }
+
+            // ---------- ANALYTICS ----------
+            function renderAnalytics() {
+                // 7-day chart
+                chartRow.innerHTML = '';
+                const days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const dateStr = getDateDaysAgo(i);
+                    const stats = computeDayStats(dateStr);
+                    days.push({ date: dateStr, ...stats });
+                }
+
+                const maxVal = Math.max(1, ...days.map(d => d.graded));
+                days.forEach(d => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'chart-bar-wrap';
+                    const bar = document.createElement('div');
+                    const height = d.graded > 0 ? (d.graded / maxVal) * 100 : 4;
+                    bar.className = 'chart-bar';
+                    // color based on grade mix
+                    if (d.prod > 0 && d.prod >= d.neut + d.wast) bar.classList.add('prod');
+                    else if (d.neut > 0 && d.neut >= d.prod + d.wast) bar.classList.add('neut');
+                    else if (d.wast > 0) bar.classList.add('wast');
+                    else bar.style.background = 'var(--border-light)';
+                    bar.style.height = height + '%';
+                    const label = document.createElement('span');
+                    label.className = 'chart-label';
+                    const dateObj = new Date(d.date + 'T00:00:00');
+                    label.textContent = dateObj.toLocaleDateString('en', { weekday: 'short' }).slice(0, 3);
+                    wrap.appendChild(bar);
+                    wrap.appendChild(label);
+                    chartRow.appendChild(wrap);
+                });
+
+                // Totals
+                const totalProd = days.reduce((s, d) => s + d.prod, 0);
+                const totalNeut = days.reduce((s, d) => s + d.neut, 0);
+                const totalWast = days.reduce((s, d) => s + d.wast, 0);
+                analyticsProd.textContent = totalProd;
+                analyticsNeut.textContent = totalNeut;
+                analyticsWast.textContent = totalWast;
+
+                // Best hour
+                const hourCounts = {};
+                for (let h = startHour; h < endHour; h++) {
+                    hourCounts[h] = 0;
+                }
+                for (const dateStr in state) {
+                    const day = state[dateStr];
+                    if (day.hours) {
+                        for (const hour in day.hours) {
+                            const entry = day.hours[hour];
+                            if (entry.grade === 'prod') {
+                                hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+                let bestHour = null;
+                let bestCount = 0;
+                for (const h in hourCounts) {
+                    if (hourCounts[h] > bestCount) {
+                        bestCount = hourCounts[h];
+                        bestHour = parseInt(h);
+                    }
+                }
+                if (bestHour !== null && bestCount > 0) {
+                    const { h, period } = fmtHour(bestHour);
+                    bestTime.textContent = `⏰ Your most productive hour: ${h}:00 ${period} (${bestCount} productive logs)`;
+                } else {
+                    bestTime.textContent = '⏰ Log more hours to find your peak time!';
+                }
+            }
+
+            const STREAK_HOUR_THRESHOLD = 3;
+            const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+
+            // Single source of truth for "current streak". A day counts once it
+            // has at least STREAK_HOUR_THRESHOLD productive hours. If today
+            // hasn't hit the threshold yet, we don't kill the streak until the
+            // day is actually over — we fall back to checking from yesterday.
+            function computeCurrentStreak() {
+                const todayStr = getTodayStr();
+                let cur = 0;
+                let probe = new Date(todayStr + 'T00:00:00');
+                if (computeDayStats(formatDate(probe)).prod < STREAK_HOUR_THRESHOLD) {
+                    probe.setDate(probe.getDate() - 1);
+                }
+                while (computeDayStats(formatDate(probe)).prod >= STREAK_HOUR_THRESHOLD) {
+                    cur++;
+                    probe.setDate(probe.getDate() - 1);
+                }
+                return cur;
+            }
+
+            function renderStreakHistory() {
+                const shLongest = document.getElementById('shLongest');
+                const heroFlame = document.getElementById('streakHeroFlame');
+                const heroNum = document.getElementById('streakHeroNum');
+                const heroSub = document.getElementById('streakHeroSub');
+                const heroFill = document.getElementById('streakHeroFill');
+                const milestonesEl = document.getElementById('streakMilestones');
+
+                const today = getTodayStr();
+                const todayDate = new Date(today + 'T00:00:00');
+
+                // All-time longest streak + current streak, scanned from the earliest
+                // logged day. A day only "counts" once it has at least
+                // STREAK_HOUR_THRESHOLD productive hours.
+                const loggedDates = Object.keys(state).filter(d => {
+                    const s = computeDayStats(d);
+                    return s.prod >= STREAK_HOUR_THRESHOLD;
+                });
+                let longest = 0;
+                let currentStreak = 0;
+
+                if (loggedDates.length) {
+                    loggedDates.sort();
+                    const earliest = new Date(loggedDates[0] + 'T00:00:00');
+                    let run = 0;
+                    const scanCursor = new Date(earliest);
+                    const scanEnd = new Date(todayDate);
+                    while (scanCursor <= scanEnd) {
+                        const dStr = formatDate(scanCursor);
+                        const hit = computeDayStats(dStr).prod >= STREAK_HOUR_THRESHOLD;
+                        if (hit) {
+                            run++;
+                            longest = Math.max(longest, run);
+                        } else {
+                            run = 0;
+                        }
+                        scanCursor.setDate(scanCursor.getDate() + 1);
+                    }
+                    currentStreak = computeCurrentStreak();
+                }
+
+                shLongest.textContent = `Longest: ${longest} day${longest === 1 ? '' : 's'}`;
+
+                heroFlame.classList.toggle('alive', currentStreak > 0);
+                if (currentStreak > 0) {
+                    heroNum.innerHTML = `<span>${currentStreak}</span> day streak`;
+                    const nextMilestone = STREAK_MILESTONES.find(m => m > currentStreak);
+                    if (nextMilestone) {
+                        const remaining = nextMilestone - currentStreak;
+                        heroSub.textContent = `${remaining} more day${remaining === 1 ? '' : 's'} to hit ${nextMilestone}`;
+                        heroFill.style.width = clamp((currentStreak / nextMilestone) * 100, 4, 100) + '%';
+                    } else {
+                        heroSub.textContent = 'Legendary status — beyond every milestone';
+                        heroFill.style.width = '100%';
+                    }
+                } else {
+                    heroNum.textContent = 'No streak yet';
+                    heroSub.textContent = `Log ${STREAK_HOUR_THRESHOLD} productive hours to start one`;
+                    heroFill.style.width = '0%';
+                }
+
+                milestonesEl.innerHTML = STREAK_MILESTONES.map(m => {
+                    const reached = longest >= m;
+                    return `<div class="milestone-badge${reached ? ' reached' : ''}">
+                        <span class="m-icon">${reached ? '🏆' : '🔒'}</span>
+                        <span class="m-label">${m}d</span>
+                    </div>`;
+                }).join('');
+            }
+
+            // ---------- RECOMPUTE UI ----------
+            function recomputeStatsAndUI() {
+                recalcTotalXP();
+                const newLevel = getLevel(totalXP);
+                const rank = getRank(newLevel);
+                const icon = getRankIcon(newLevel);
+
+                if (newLevel > prevLevel && !isInitialLoad) {
+                    levelBadge.classList.remove('pulse');
+                    void levelBadge.offsetWidth;
+                    levelBadge.classList.add('pulse');
+                    fireConfetti(40);
+                }
+                prevLevel = newLevel;
+                level = newLevel;
+
+                lvlNum.textContent = level;
+                rankTitle.textContent = rank;
+                rankBadge.textContent = icon;
+
+                const floor = getXPFloor(level);
+                const ceil = getXPCeil(level);
+                const pct = clamp(((totalXP - floor) / (ceil - floor)) * 100, 0, 100);
+                xpFill.style.width = pct + '%';
+                xpNow.textContent = totalXP + ' XP';
+                xpNext.textContent = (ceil - totalXP) + ' XP to Lv.' + (level + 1);
+
+                // Streak: consecutive days with at least STREAK_HOUR_THRESHOLD productive hours
+                streak = computeCurrentStreak();
+                document.getElementById('streakCount').textContent = streak;
+
+                const s = fmtHour(startHour);
+                const e = fmtHour(endHour);
+                winLabel.innerHTML =
+                    `<span class="accent">${s.h}:00 ${s.period}</span> – <span class="accent">${e.h}:00 ${e.period}</span>`;
+
+                updateDayDisplay();
+
+                const stats = computeDayStats(currentDateStr);
+                const prodEl = document.getElementById('cntProd');
+                const neutEl = document.getElementById('cntNeut');
+                const wastEl = document.getElementById('cntWast');
+                const prevProd = parseInt(prodEl.textContent);
+                const prevNeut = parseInt(neutEl.textContent);
+                const prevWast = parseInt(wastEl.textContent);
+                if (prevProd !== stats.prod) { prodEl.classList.add('pop');
+                    setTimeout(() => prodEl.classList.remove('pop'), 200); }
+                if (prevNeut !== stats.neut) { neutEl.classList.add('pop');
+                    setTimeout(() => neutEl.classList.remove('pop'), 200); }
+                if (prevWast !== stats.wast) { wastEl.classList.add('pop');
+                    setTimeout(() => wastEl.classList.remove('pop'), 200); }
+                cntProd.textContent = stats.prod;
+                cntNeut.textContent = stats.neut;
+                cntWast.textContent = stats.wast;
+
+                // Goal
+                renderGoalCard(stats);
+
+                // Achievements
+                computeAchievements();
+
+                // Analytics
+                renderAnalytics();
+
+                saveState();
+                isInitialLoad = false;
+            }
+
+            // ---------- GOAL ----------
+            function renderGoalCard(stats) {
+                const day = getDayData(currentDateStr);
+                const goal = day.goal;
+                const achieved = goal.target > 0 && stats.prod >= goal.target;
+
+                goalCard.classList.toggle('achieved', achieved);
+
+                if (achieved && !goal.achievedFired && !isInitialLoad) {
+                    goal.achievedFired = true;
+                    fireConfetti(30);
+                    if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
+                } else if (!achieved) {
+                    goal.achievedFired = false;
+                }
+
+                if (goalCard.dataset.editing === '1') {
+                    return; // don't blow away an in-progress edit
+                }
+
+                if (!goal.text && !goal.target) {
+                    goalCard.innerHTML = `
+                        <div class="goal-empty" id="goalEmptyRow">
+                            <div class="prompt"><span class="plus">+</span> Set a goal for today</div>
+                        </div>
+                    `;
+                    document.getElementById('goalEmptyRow').addEventListener('click', openGoalEditor);
+                    return;
+                }
+
+                const pct = goal.target > 0 ? clamp((stats.prod / goal.target) * 100, 0, 100) : 0;
+                goalCard.innerHTML = `
+                    <div class="goal-set">
+                        <div class="goal-status-icon">${achieved ? '✓' : '🎯'}</div>
+                        <div class="goal-body">
+                            <div class="goal-text">${escapeHtml(goal.text || 'Daily goal')}</div>
+                            <div class="goal-progress-row">
+                                <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
+                                <div class="goal-frac">${stats.prod}/${goal.target}</div>
+                            </div>
+                        </div>
+                        <div class="goal-actions">
+                            <button id="goalEditBtn" title="Edit">✎</button>
+                            <button id="goalClearBtn" title="Clear">×</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('goalEditBtn').addEventListener('click', openGoalEditor);
+                document.getElementById('goalClearBtn').addEventListener('click', () => {
+                    goal.text = '';
+                    goal.target = 0;
+                    goal.achievedFired = false;
+                    saveState();
+                    recomputeStatsAndUI();
+                });
+            }
+
+            function openGoalEditor() {
+                goalCard.dataset.editing = '1';
+                const day = getDayData(currentDateStr);
+                renderGoalEditor(day.goal);
+            }
+
+            function renderGoalEditor(goal) {
+                let target = goal.target || 3;
+                goalCard.innerHTML = `
+                    <div class="goal-edit-row">
+                        <input type="text" id="goalTextInput" placeholder="What's today's goal?" maxlength="60" value="${escapeHtml(goal.text || '')}">
+                        <div class="goal-target-row">
+                            <span class="lbl">Productive hours target</span>
+                            <div class="goal-stepper">
+                                <button id="goalMinus">−</button>
+                                <span class="val" id="goalTargetVal">${target}</span>
+                                <button id="goalPlus">+</button>
+                            </div>
+                        </div>
+                        <div class="goal-edit-buttons">
+                            <button id="goalCancelBtn">Cancel</button>
+                            <button class="save-btn" id="goalSaveBtn">Save Goal</button>
+                        </div>
+                    </div>
+                `;
+                const targetVal = document.getElementById('goalTargetVal');
+                document.getElementById('goalMinus').addEventListener('click', () => {
+                    target = Math.max(1, target - 1);
+                    targetVal.textContent = target;
+                });
+                document.getElementById('goalPlus').addEventListener('click', () => {
+                    target = Math.min(16, target + 1);
+                    targetVal.textContent = target;
+                });
+                document.getElementById('goalCancelBtn').addEventListener('click', () => {
+                    goalCard.dataset.editing = '';
+                    recomputeStatsAndUI();
+                });
+                document.getElementById('goalSaveBtn').addEventListener('click', () => {
+                    const textInput = document.getElementById('goalTextInput');
+                    goal.text = textInput.value.trim();
+                    goal.target = target;
+                    goal.achievedFired = false;
+                    goalCard.dataset.editing = '';
+                    saveState();
+                    recomputeStatsAndUI();
+                });
+            }
+
+            function updateDayDisplay() {
+                const dateObj = new Date(currentDateStr + 'T00:00:00');
+                const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                let label = dateObj.toLocaleDateString('en-US', options);
+                if (currentDateStr === getTodayStr()) {
+                    label = 'Today';
+                } else if (currentDateStr === formatDate(new Date(Date.now() - 86400000))) {
+                    label = 'Yesterday';
+                }
+                dayDisplay.textContent = label;
+
+                const stats = computeDayStats(currentDateStr);
+                if (stats.grade) {
+                    dayGradeBadge.textContent = stats.gradeLabel;
+                    dayGradeBadge.className = `grade-badge ${stats.gradeClass}`;
+                } else {
+                    dayGradeBadge.textContent = '–';
+                    dayGradeBadge.className = 'grade-badge grade-none';
+                }
+            }
+
+            // ---------- NAVIGATION ----------
+            function goToDate(dateStr) {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                grid.classList.add('fade');
+                setTimeout(() => {
+                    currentDateStr = dateStr;
+                    getDayData(currentDateStr);
+                    goalCard.dataset.editing = '';
+                    renderGrid();
+                    for (let h = startHour; h < endHour; h++) {
+                        const card = grid.querySelector(`.hour-card[data-hour="${h}"]`);
+                        if (card) {
+                            const entry = getHourEntry(currentDateStr, h);
+                            if (entry.text) card.querySelector('textarea').value = entry.text;
+                            updateGradeUI(card, h);
+                            updateNote(card, h);
+                        }
+                    }
+                    recomputeStatsAndUI();
+                    document.querySelectorAll('.hour-card.open').forEach(c => {
+                        c._isOpen = false;
+                        c.classList.remove('open');
+                    });
+                    saveState();
+                    grid.classList.remove('fade');
+                    isTransitioning = false;
+                }, 200);
+            }
+
+            function goToPrevDay() {
+                const d = new Date(currentDateStr + 'T00:00:00');
+                d.setDate(d.getDate() - 1);
+                goToDate(formatDate(d));
+            }
+
+            function goToNextDay() {
+                const d = new Date(currentDateStr + 'T00:00:00');
+                d.setDate(d.getDate() + 1);
+                if (d > new Date()) return;
+                goToDate(formatDate(d));
+            }
+
+            // ---------- WINDOW MODAL ----------
+            function populateSelects() {
+                startSelect.innerHTML = '';
+                endSelect.innerHTML = '';
+                for (let i = 0; i < 24; i++) {
+                    const { h, period } = fmtHour(i);
+                    const label = `${h}:00 ${period}`;
+                    const opt1 = document.createElement('option');
+                    opt1.value = i;
+                    opt1.textContent = label;
+                    startSelect.appendChild(opt1);
+                    const opt2 = document.createElement('option');
+                    opt2.value = i;
+                    opt2.textContent = label;
+                    endSelect.appendChild(opt2);
+                }
+                startSelect.value = startHour;
+                endSelect.value = endHour;
+            }
+
+            function openModal() {
+                startSelect.value = startHour;
+                endSelect.value = endHour;
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+            }
+
+            function applyWindow() {
+                const s = parseInt(startSelect.value);
+                const e = parseInt(endSelect.value);
+                if (s >= e) {
+                    alert('Start must be before end.');
+                    return;
+                }
+                startHour = s;
+                endHour = e;
+                closeModal();
+                goToDate(currentDateStr);
+                saveState();
+                scheduleHourlyNotifications();
+            }
+
+            // ---------- THEME ----------
+            function toggleTheme() {
+                theme = theme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+                saveState();
+            }
+
+            // ---------- ONBOARDING ----------
+            function startOnboarding() {
+                onboardStep = 0;
+                showOnboardStep();
+                onboardingOverlay.classList.add('active');
+            }
+
+            function showOnboardStep() {
+                const step = onboardSteps[onboardStep];
+                onboardIcon.textContent = step.icon;
+                onboardTitle.textContent = step.title;
+                onboardDesc.textContent = step.desc;
+                // update dots
+                const dots = onboardStepsDots.querySelectorAll('.dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === onboardStep);
+                });
+                onboardNext.textContent = onboardStep < onboardSteps.length - 1 ? 'Next' : 'Start Tracking';
+            }
+
+            function nextOnboardStep() {
+                if (onboardStep < onboardSteps.length - 1) {
+                    onboardStep++;
+                    showOnboardStep();
+                } else {
+                    onboardingOverlay.classList.remove('active');
+                    localStorage.setItem('hourly_onboarded', 'true');
+                }
+            }
+
+            function skipOnboarding() {
+                onboardingOverlay.classList.remove('active');
+                localStorage.setItem('hourly_onboarded', 'true');
+            }
+
+            // ---------- NATIVE NOTIFICATIONS ----------
+            // Only runs inside the packaged native app (Capacitor). In a plain
+            // browser preview, window.Capacitor is undefined and this quietly no-ops.
+            function isNative() {
+                return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+            }
+
+            function getLocalNotifications() {
+                return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+            }
+
+            async function requestNotificationPermission() {
+                const LN = getLocalNotifications();
+                if (!LN) return false;
+                try {
+                    const perm = await LN.checkPermissions();
+                    if (perm.display === 'granted') return true;
+                    const req = await LN.requestPermissions();
+                    return req.display === 'granted';
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            // Fixed ID range reserved for hourly reminders (0-99) so we can
+            // cancel/reschedule cleanly whenever the active window changes.
+            async function scheduleHourlyNotifications() {
+                if (!isNative()) return;
+                const LN = getLocalNotifications();
+                if (!LN) return;
+
+                const granted = await requestNotificationPermission();
+                if (!granted) return;
+
+                try {
+                    const pending = await LN.getPending();
+                    const ours = (pending.notifications || []).filter(n => n.id >= 1 && n.id < 100);
+                    if (ours.length) {
+                        await LN.cancel({ notifications: ours.map(n => ({ id: n.id })) });
+                    }
+                } catch (_) { /* ignore */ }
+
+                const notifications = [];
+                for (let h = startHour; h < endHour; h++) {
+                    const { h: hh, period } = fmtHour(h);
+                    notifications.push({
+                        id: h + 1, // 1-99 reserved range, avoids id 0
+                        title: `${hh}:00 ${period} — log it`,
+                        body: 'What did you actually do this hour? Tap to grade it.',
+                        schedule: { on: { hour: h, minute: 0 }, allowWhileIdle: true },
+                        smallIcon: 'ic_stat_icon_config_sample',
+                    });
+                }
+
+                if (notifications.length) {
+                    try {
+                        await LN.schedule({ notifications });
+                    } catch (_) { /* ignore */ }
+                }
+            }
+
+            // ---------- RESET ----------
+            function resetAll() {
+                if (confirm('Reset all data? This cannot be undone.')) {
+                    state = {};
+                    totalXP = 0;
+                    prevLevel = 1;
+                    level = 1;
+                    streak = 0;
+                    unlockedAchievements = new Set();
+                    currentDateStr = getTodayStr();
+                    getDayData(currentDateStr);
+                    renderGrid();
+                    recomputeStatsAndUI();
+                    saveState();
+                }
+            }
+
+            // ---------- INIT ----------
+            function init() {
+                const loaded = loadState();
+                if (!loaded) {
+                    state = {};
+                    totalXP = 0;
+                    level = 1;
+                    prevLevel = 1;
+                    streak = 0;
+                    unlockedAchievements = new Set();
+                } else {
+                    level = getLevel(totalXP);
+                    prevLevel = level;
+                }
+
+                // Theme
+                document.documentElement.setAttribute('data-theme', theme);
+                themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+
+                const today = getTodayStr();
+                if (!state[today]) state[today] = { hours: {} };
+                currentDateStr = today;
+
+                populateSelects();
+                renderGrid();
+                for (let h = startHour; h < endHour; h++) {
+                    const card = grid.querySelector(`.hour-card[data-hour="${h}"]`);
+                    if (card) {
+                        const entry = getHourEntry(currentDateStr, h);
+                        if (entry.text) card.querySelector('textarea').value = entry.text;
+                        updateGradeUI(card, h);
+                        updateNote(card, h);
+                    }
+                }
+                recomputeStatsAndUI();
+
+                // Onboarding
+                if (!localStorage.getItem('hourly_onboarded')) {
+                    setTimeout(startOnboarding, 400);
+                }
+
+                // events
+                editWindowBtn.addEventListener('click', openModal);
+
+                modalCloseBtn.addEventListener('click', closeModal);
+                modalApplyBtn.addEventListener('click', applyWindow);
+                resetBtn.addEventListener('click', resetAll);
+
+                const exportBackupBtn = document.getElementById('exportBackupBtn');
+                if (exportBackupBtn) exportBackupBtn.addEventListener('click', exportBackup);
+                const importBackupBtn = document.getElementById('importBackupBtn');
+                const importFileInput = document.getElementById('importFileInput');
+                if (importBackupBtn && importFileInput) {
+                    importBackupBtn.addEventListener('click', () => importFileInput.click());
+                    importFileInput.addEventListener('change', (e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (file) importBackupFile(file);
+                        importFileInput.value = '';
+                    });
+                }
+                prevDayBtn.addEventListener('click', goToPrevDay);
+                nextDayBtn.addEventListener('click', goToNextDay);
+                themeToggle.addEventListener('click', toggleTheme);
+                onboardNext.addEventListener('click', nextOnboardStep);
+                onboardSkip.addEventListener('click', skipOnboarding);
+
+                // Analytics toggle
+                function openAnalyticsPanel() {
+                    analyticsToggle.classList.add('open');
+                    analyticsPanel.classList.add('open');
+                    renderAnalytics();
+                    requestAnimationFrame(() => {
+                        analyticsPanel.style.maxHeight = analyticsPanel.scrollHeight + 'px';
+                    });
+                }
+                function closeAnalyticsPanel() {
+                    analyticsToggle.classList.remove('open');
+                    analyticsPanel.classList.remove('open');
+                    analyticsPanel.style.maxHeight = '0px';
+                }
+                analyticsToggle.addEventListener('click', () => {
+                    if (analyticsPanel.classList.contains('open')) {
+                        closeAnalyticsPanel();
+                    } else {
+                        openAnalyticsPanel();
+                    }
+                });
+
+                // Streak popup — opened only by tapping the header pill
+                const streakPanel = document.getElementById('streakPanel');
+                const streakPillBtn = document.getElementById('streakPillBtn');
+                const streakCloseBtn = document.getElementById('streakCloseBtn');
+                function openStreakPanel() {
+                    renderStreakHistory();
+                    streakPanel.classList.add('open');
+                }
+                function closeStreakPanel() {
+                    streakPanel.classList.remove('open');
+                }
+                streakPillBtn.addEventListener('click', () => {
+                    if (streakPanel.classList.contains('open')) {
+                        closeStreakPanel();
+                    } else {
+                        openStreakPanel();
+                    }
+                });
+                streakCloseBtn.addEventListener('click', closeStreakPanel);
+                streakPanel.addEventListener('click', (e) => {
+                    if (e.target === streakPanel) closeStreakPanel();
+                });
+
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) closeModal();
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') { closeModal(); closeStreakPanel(); }
+                    if (e.key === 'ArrowLeft') goToPrevDay();
+                    if (e.key === 'ArrowRight') goToNextDay();
+                });
+
+                window.addEventListener('beforeunload', saveState);
+
+                scheduleHourlyNotifications();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
